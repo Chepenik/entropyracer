@@ -53,6 +53,7 @@
 
     button, input { font: inherit; }
     button { color: inherit; }
+    button:focus-visible, input:focus-visible, #game-canvas:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
     a { color: var(--cyan); }
     [hidden] { display: none !important; }
 
@@ -199,13 +200,28 @@
     .session-label { color: #869bb1; font: 700 11px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
     .game-actions { display: flex; gap: 7px; }
     .icon-button { padding: 8px 11px; border: 1px solid rgba(130,155,181,.25); background: #08111f; color: #9db1c6; font: 700 10px/1 var(--mono); }
-    .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; min-height: 650px; }
-    .canvas-wrap { position: relative; min-height: 650px; overflow: hidden; background: #02050a; }
-    #game-canvas { display: block; width: 100%; height: 100%; min-height: 650px; outline: none; }
+    .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; min-height: 700px; }
+    .canvas-wrap { position: relative; min-height: 700px; overflow: hidden; background: #02050a; }
+    #game-canvas { display: block; width: 100%; height: 100%; min-height: 700px; }
     .controls-tip { position: absolute; left: 16px; bottom: 15px; padding: 9px 12px; background: rgba(2,5,10,.72); color: #9cb1c5; font: 700 10px/1.4 var(--mono); letter-spacing: .07em; text-transform: uppercase; pointer-events: none; }
     kbd { display: inline-block; min-width: 22px; margin: 0 2px; padding: 3px 5px; border: 1px solid #567086; border-bottom-width: 2px; background: #101b28; color: white; text-align: center; font: 700 10px/1 var(--mono); }
+    .game-hud { position: absolute; inset: 14px 14px auto auto; width: min(300px, calc(100% - 190px)); pointer-events: none; }
+    .objective-card, .flow-card { margin-bottom: 8px; padding: 10px 12px; border: 1px solid rgba(76,233,245,.25); background: rgba(2,5,10,.8); backdrop-filter: blur(5px); }
+    .hud-label { color: var(--cyan); font: 700 9px/1.3 var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+    .objective-text { margin-top: 4px; color: #fff; font: 800 12px/1.35 var(--mono); }
+    .flow-line { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 5px; font: 800 11px/1 var(--mono); }
+    .flow-meter { flex: 1; height: 5px; overflow: hidden; background: #182231; }
+    .flow-meter span { display: block; height: 100%; width: 0; background: linear-gradient(90deg,var(--purple),var(--orange)); box-shadow: 0 0 9px var(--orange); transition: width .12s; }
+    .pause-overlay { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; padding: 30px; text-align: center; background: rgba(2,5,10,.78); backdrop-filter: blur(4px); }
+    .pause-overlay div { max-width: 430px; padding: 24px; border: 1px solid var(--cyan); background: #07111e; }
+    .pause-overlay strong { display: block; color: white; font-size: 25px; text-transform: uppercase; }
+    .pause-overlay span { color: #9bb0c8; font: 12px/1.6 var(--mono); }
+    .lesson-card { position: absolute; z-index: 5; left: 16px; top: 82px; width: min(390px, calc(100% - 32px)); padding: 14px 45px 14px 15px; border: 1px solid rgba(247,147,26,.55); background: rgba(7,12,21,.94); box-shadow: 0 12px 35px rgba(0,0,0,.35); }
+    .lesson-card strong { display: block; color: var(--orange); font: 800 11px/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .lesson-card p { margin: 5px 0 0; color: #d0dbe6; font-size: 13px; line-height: 1.45; }
+    .lesson-close { position: absolute; right: 8px; top: 8px; min-width: 30px; min-height: 30px; border: 1px solid #536a80; background: #0d1926; cursor: pointer; }
 
-    .reactor-panel { position: relative; padding: 22px; border-left: 1px solid var(--line); overflow: hidden; }
+    .reactor-panel { position: relative; padding: 20px; border-left: 1px solid var(--line); overflow: auto; }
     .reactor-panel::before { content: ""; position: absolute; width: 220px; height: 220px; right: -80px; top: 260px; border: 1px solid rgba(76,233,245,.12); border-radius: 50%; box-shadow: 0 0 55px rgba(76,233,245,.06); }
     .reactor-title { margin: 5px 0 22px; font-size: 23px; line-height: 1; text-transform: uppercase; }
     .source { position: relative; margin: 0 0 12px; padding: 14px; border: 1px solid rgba(88,121,151,.2); background: rgba(6,14,25,.76); }
@@ -215,7 +231,7 @@
     .source-value.ready { color: var(--green); }
     .meter { height: 4px; margin-top: 10px; overflow: hidden; background: #101b28; }
     .meter span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--blue), var(--cyan)); box-shadow: 0 0 10px var(--cyan); transition: width .25s; }
-    .reactor-core { display: grid; place-items: center; width: 156px; height: 156px; margin: 21px auto; border: 1px solid rgba(76,233,245,.25); border-radius: 50%; background: radial-gradient(circle, rgba(76,233,245,.17), rgba(57,148,255,.04) 45%, transparent 67%); box-shadow: inset 0 0 30px rgba(76,233,245,.07), 0 0 35px rgba(76,233,245,.06); animation: breathe 3s ease-in-out infinite; }
+    .reactor-core { display: grid; place-items: center; width: 120px; height: 120px; margin: 16px auto; border: 1px solid rgba(76,233,245,.25); border-radius: 50%; background: radial-gradient(circle, rgba(76,233,245,.17), rgba(57,148,255,.04) 45%, transparent 67%); box-shadow: inset 0 0 30px rgba(76,233,245,.07), 0 0 35px rgba(76,233,245,.06); animation: breathe 3s ease-in-out infinite; }
     .reactor-core.ready { border-color: var(--orange); background: radial-gradient(circle, rgba(247,147,26,.26), rgba(169,112,255,.08) 46%, transparent 68%); box-shadow: 0 0 40px rgba(247,147,26,.2), inset 0 0 28px rgba(247,147,26,.12); }
     .core-text { text-align: center; color: var(--cyan); font: 900 12px/1.45 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
     .reactor-core.ready .core-text { color: var(--orange); }
@@ -228,11 +244,29 @@
     .switch span { position: absolute; inset: 0; border: 1px solid #42576e; border-radius: 20px; background: #101a26; cursor: pointer; }
     .switch span::after { content: ""; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; border-radius: 50%; background: #71849a; transition: transform .2s, background .2s; }
     .switch input:checked + span::after { transform: translateX(18px); background: var(--orange); }
+    .switch input:focus-visible + span { outline: 3px solid #fff; outline-offset: 3px; }
     .physical-controls { margin-top: 13px; }
     .physical-controls p { margin: 0 0 10px; color: #73889e; font-size: 12px; }
     .tiny-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
     .tiny-buttons button { min-width: 36px; padding: 7px 8px; border: 1px solid rgba(76,233,245,.25); background: #0b1624; color: #b7c8d9; cursor: pointer; font: 700 10px/1 var(--mono); }
     .physical-note { min-height: 31px; color: var(--orange) !important; font: 10px/1.45 var(--mono); }
+    .mapping { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; margin: 8px 0; }
+    .mapping span { padding: 6px 3px; border: 1px solid rgba(76,233,245,.2); background: #081321; text-align: center; color: #bfd0df; font: 700 9px/1.25 var(--mono); }
+    .mapping .reroll { grid-column: span 4; border-color: rgba(247,147,26,.45); color: #ffd39e; }
+    .rejection-callout { padding: 9px; border-left: 3px solid var(--orange); background: rgba(247,147,26,.08); color: #ffd8aa !important; font: 700 10px/1.45 var(--mono); }
+    .die-machine { position: relative; height: 38px; margin: 8px 0; overflow: hidden; border: 1px dashed #405a70; background: #050d17; }
+    .die-machine::after { content: "ACCEPT"; position: absolute; right: 7px; top: 11px; color: var(--green); font: 700 9px/1 var(--mono); }
+    .die-token { position: absolute; left: 7px; top: 7px; display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--cyan); background: #102032; font: 800 11px/1 var(--mono); }
+    .die-machine.rejecting::after { content: "REROLL"; color: var(--orange); }
+    .die-machine.animating .die-token { animation: machine-pass .65s ease both; }
+    .die-machine.rejecting .die-token { animation: machine-reject .7s ease both; border-color: var(--orange); }
+    @keyframes machine-pass { 0% { transform: translateX(0); } 75% { transform: translateX(245px); opacity: 1; } 100% { transform: translateX(270px); opacity: 0; } }
+    @keyframes machine-reject { 0% { transform: translateX(0); } 52% { transform: translateX(145px); } 70% { transform: translateX(105px) rotate(20deg); } 100% { transform: translateX(-40px) rotate(-35deg); opacity: 0; } }
+    .physical-stats { display: flex; gap: 12px; color: #94a9bc; font: 700 9px/1.4 var(--mono); }
+    .physical-history { display: flex; flex-wrap: wrap; gap: 4px; min-height: 22px; margin: 7px 0; padding: 0; list-style: none; }
+    .physical-history li { padding: 4px 6px; border: 1px solid #294258; color: #aac0d3; font: 700 8px/1 var(--mono); }
+    .physical-history .reroll { border-color: rgba(247,147,26,.45); color: #ffc47a; }
+    .physical-trust { color: #91a5b8 !important; font: 10px/1.45 var(--mono); }
     .generate-wrap { margin-top: 18px; }
     .generate-wrap .primary { width: 100%; font-size: 12px; }
 
@@ -246,6 +280,20 @@
     .word-index { flex: 0 0 20px; color: #5d7186; font: 10px/1 var(--mono); }
     .word-value { overflow: hidden; color: white; font: 800 clamp(13px, 1.5vw, 17px)/1.2 var(--mono); text-overflow: ellipsis; }
     .custody-warning { margin: 23px 0; color: #ffb5c4; font: 800 12px/1.7 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    .session-summary { position: relative; max-width: 760px; margin: 0 auto 24px; padding: 18px; border: 1px solid rgba(76,233,245,.25); background: #06101b; text-align: left; }
+    .setup-inline-lesson { margin-top: 24px; padding-right: 54px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 12px; }
+    .summary-grid div { padding: 10px; background: #0b1724; }
+    .summary-grid span { display: block; color: #71869a; font: 9px/1.3 var(--mono); text-transform: uppercase; }
+    .summary-grid strong { color: #fff; font: 800 12px/1.4 var(--mono); }
+
+    .pipeline { padding: 18px; border-top: 1px solid var(--line); background: #040a12; }
+    .pipeline-flow { display: grid; grid-template-columns: minmax(0,1fr) 24px minmax(0,1fr) 24px minmax(0,1fr) 34px repeat(4,minmax(0,1fr)); gap: 6px; align-items: stretch; margin-top: 12px; }
+    .pipeline-node { min-height: 68px; padding: 9px; border: 1px solid #294056; background: #091522; color: #adc0d1; cursor: pointer; text-align: left; font: 700 9px/1.35 var(--mono); text-transform: uppercase; }
+    .pipeline-node[aria-pressed="true"], .pipeline-node.active { border-color: var(--orange); color: white; box-shadow: inset 0 -3px var(--orange); }
+    .pipeline-plus, .pipeline-arrow { display: grid; place-items: center; color: var(--cyan); font: 900 18px/1 var(--mono); }
+    .pipeline-arrow { grid-column: 1 / -1; min-height: 22px; }
+    .pipeline-note { min-height: 42px; margin: 10px 0 0; color: #aabccc; font-size: 12px; }
 
     .learn { padding: 40px 0 100px; border-top: 1px solid var(--line); }
     .learn-head { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: end; margin-bottom: 28px; }
@@ -272,11 +320,14 @@
     .fatal { max-width: 920px; margin: 22px auto; padding: 20px; border: 1px solid var(--danger); background: rgba(255,85,120,.08); color: #ffc1ce; font: 700 13px/1.6 var(--mono); }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-    @media (max-width: 1000px) {
+    @media (max-width: 1100px) {
       .game-layout { grid-template-columns: 1fr; }
       .reactor-panel { border-left: 0; border-top: 1px solid var(--line); }
-      .canvas-wrap, #game-canvas { min-height: 560px; }
+      .canvas-wrap, #game-canvas { min-height: 620px; }
       .source::after { display: none; }
+      .pipeline-flow { grid-template-columns: repeat(2,1fr); }
+      .pipeline-plus { display: none; }
+      .pipeline-arrow { grid-column: 1 / -1; }
     }
     @media (max-width: 720px) {
       .shell { width: min(100% - 24px, 1380px); }
@@ -286,7 +337,12 @@
       .choice-grid, .learn-head, .details-grid { grid-template-columns: 1fr; }
       .mnemonic-grid { grid-template-columns: repeat(2, 1fr); }
       .transparency-grid { grid-template-columns: 1fr 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
       .footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
     }
   </style>
 </head>
@@ -319,7 +375,7 @@
       <p class="hero-copy">Pilot a machine through cryptographic space. Your movement joins fresh system randomness—and optional physical randomness—in a transparent BIP39 generation experiment.</p>
       <div class="offline-callout">
         <span aria-hidden="true">◈</span>
-        <div><strong>Best-security workflow:</strong> inspect this open-source file, save it locally, disconnect the computer from networking, then open the file directly. Local file mode reduces some attack surface; it does not make a compromised machine safe.</div>
+        <div><strong>Best-security workflow:</strong> inspect this open-source file, save it locally, disconnect the computer from networking, then open the file directly. A <code>file://</code> address does not prove networking is disconnected, and local mode does not make a compromised machine safe. Established hardware-wallet workflows remain preferable for meaningful funds.</div>
       </div>
     </section>
 
@@ -346,6 +402,11 @@
           <button class="primary" id="start-button" disabled>Start fresh entropy session</button>
         </div>
         <p class="microcopy" id="setup-status">Cryptographic self-tests are running. Generation remains locked until they pass.</p>
+        <div class="session-summary setup-inline-lesson" id="setup-lesson">
+          <button class="lesson-close" id="setup-lesson-close" aria-label="Dismiss lesson">×</button>
+          <div class="eyebrow">Before you start · mnemonic length</div>
+          <p><strong>12 words</strong> encode 128 entropy bits plus a 4-bit checksum; <strong>24 words</strong> encode 256 entropy bits plus an 8-bit checksum. Both are standard BIP39 sizes. More words increase the entropy size, but neither choice fixes a compromised device, exposed backup, or incompatible wallet.</p>
+        </div>
       </div>
     </section>
 
@@ -361,11 +422,23 @@
         <div class="game-layout">
           <div class="canvas-wrap">
             <canvas id="game-canvas" tabindex="0" aria-label="Entropy Racer game. Use arrow keys to drive and Space to fire."></canvas>
-            <div class="controls-tip"><kbd>↑</kbd><kbd>↓</kbd> thrust · <kbd>←</kbd><kbd>→</kbd> steer · <kbd>space</kbd> laser</div>
+            <div class="game-hud">
+              <div class="objective-card" aria-live="polite"><div class="hud-label">Current micro-objective</div><div class="objective-text" id="objective-text">Drive to begin</div></div>
+              <div class="flow-card"><div class="hud-label">Chaos flow · score only, not entropy bits</div><div class="flow-line"><div class="flow-meter"><span id="flow-meter"></span></div><span id="flow-label">x1 · 0</span></div></div>
+            </div>
+            <aside class="lesson-card" id="lesson-card" aria-live="polite" hidden>
+              <button class="lesson-close" id="lesson-close" aria-label="Dismiss lesson">×</button>
+              <strong id="lesson-title">Session lesson</strong>
+              <p id="lesson-text"></p>
+            </aside>
+            <div class="pause-overlay" id="pause-overlay" hidden>
+              <div><strong>Paused</strong><span>Focus left the game. Return here and press an Arrow key or Space to continue. Paused time is not presented as entropy.</span></div>
+            </div>
+            <div class="controls-tip"><kbd>↑</kbd> thrust · <kbd>↓</kbd> brake · <kbd>←</kbd><kbd>→</kbd> steer / drift · <kbd>space</kbd> laser</div>
           </div>
           <aside class="reactor-panel" aria-label="Entropy reactor status">
             <div class="eyebrow">Live entropy reactor</div>
-            <h2 class="reactor-title">Three independent inputs</h2>
+            <h2 class="reactor-title">Three separately hashed inputs</h2>
             <div class="source">
               <div class="source-label"><span>System entropy</span><span>Source 01</span></div>
               <div class="source-value ready">CSPRNG READY</div>
@@ -389,19 +462,28 @@
 
             <div class="physical-panel">
               <div class="toggle-line">
-                <div><div class="eyebrow">Paranoid mode</div><div class="microcopy">Add physical randomness</div></div>
+                <div><div class="eyebrow">Physical source</div><div class="microcopy">Add optional recorded outcomes</div></div>
                 <label class="switch"><span class="sr-only">Enable physical entropy</span><input id="physical-toggle" type="checkbox"><span aria-hidden="true"></span></label>
               </div>
               <div class="physical-controls" id="physical-controls" hidden>
-                <p>Coin: Heads = 0, Tails = 1</p>
+                <p><strong>Coin mapping:</strong> Heads = 0 · Tails = 1. A fair coin has two equally likely outcomes, matching one unbiased bit.</p>
                 <div class="tiny-buttons">
                   <button data-coin="0">Heads</button><button data-coin="1">Tails</button>
                 </div>
-                <p>Fair die: 1–4 yield two bits; 5–6 are rejected.</p>
+                <p><strong>Fair-die mapping:</strong> two unbiased bits have four equally likely values, but a die has six outcomes. Directly squeezing six into four would bias some values, so rejection sampling is required.</p>
+                <div class="mapping" aria-label="Fair die to bit mapping">
+                  <span>1 → 00</span><span>2 → 01</span><span>3 → 10</span><span>4 → 11</span>
+                  <span class="reroll">5 or 6 → REJECTED · ROLL AGAIN · ZERO BITS</span>
+                </div>
+                <p class="rejection-callout">5/6 rejection is correct—not an error. Four of six faces are accepted: probability 2/3, averaging 1.5 rolls per accepted two-bit pair.</p>
                 <div class="tiny-buttons">
                   <button data-die="1">1</button><button data-die="2">2</button><button data-die="3">3</button><button data-die="4">4</button><button data-die="5">5</button><button data-die="6">6</button>
                 </div>
+                <div class="die-machine" id="die-machine" aria-hidden="true"><span class="die-token" id="die-token">–</span></div>
+                <div class="physical-stats"><span>ACCEPTED <b id="accepted-count">0</b></span><span>REROLL <b id="rejected-count">0</b></span></div>
+                <ul class="physical-history" id="physical-history" aria-label="Recent physical outcomes"></ul>
                 <p class="physical-note" id="physical-note" aria-live="polite">Enter outcomes exactly as they occur. Never cherry-pick.</p>
+                <p class="physical-trust">Record every physical outcome honestly and in sequence. Software cannot verify that you used a fair coin or die, actually rolled or flipped it, or entered outcomes honestly. Physical input can add an independent source; it does not guarantee absolute security.</p>
               </div>
             </div>
             <div class="generate-wrap">
@@ -409,6 +491,20 @@
             </div>
           </aside>
         </div>
+        <section class="pipeline" aria-labelledby="pipeline-title">
+          <div class="eyebrow">Interactive non-secret pipeline</div>
+          <h2 class="reactor-title" id="pipeline-title">How this session becomes words</h2>
+          <div class="pipeline-flow" id="pipeline-flow">
+            <button class="pipeline-node" data-pipeline="system" aria-pressed="true">System CSPRNG</button><span class="pipeline-plus" aria-hidden="true">+</span>
+            <button class="pipeline-node" data-pipeline="game">Gameplay transcript</button><span class="pipeline-plus" aria-hidden="true">+</span>
+            <button class="pipeline-node" data-pipeline="physical">Optional physical input</button><span class="pipeline-plus" aria-hidden="true">→</span>
+            <button class="pipeline-node" data-pipeline="components">Independent domain-separated SHA-256 components</button>
+            <button class="pipeline-node" data-pipeline="final">Final domain-separated digest</button>
+            <button class="pipeline-node" data-pipeline="entropy">128- or 256-bit BIP39 entropy</button>
+            <button class="pipeline-node" data-pipeline="words">Checksum → 12 or 24 words</button>
+          </div>
+          <p class="pipeline-note" id="pipeline-note">The browser CSPRNG supplies the foundational secret randomness. It is designed for security, but it is not proof of “true randomness” or an uncompromised device.</p>
+        </section>
       </div>
     </section>
 
@@ -417,6 +513,16 @@
         <div class="eyebrow sensitive">Sensitive transition</div>
         <h2 class="section-heading">Leave the arcade behind</h2>
         <p class="section-lede">Your seed phrase controls the Bitcoin wallet derived from it. Anyone who obtains these words can control those funds.</p>
+        <div class="session-summary" aria-labelledby="summary-title">
+          <div class="eyebrow" id="summary-title">What happened in this session? · non-secret metadata only</div>
+          <div class="summary-grid">
+            <div><span>Collection</span><strong id="summary-events">—</strong></div>
+            <div><span>Driving</span><strong id="summary-driving">—</strong></div>
+            <div><span>Physical input</span><strong id="summary-physical">—</strong></div>
+          </div>
+          <p class="microcopy">Fresh WebCrypto state, the gameplay transcript, and optional physical input will be hashed as separate framed components, then combined. These counts describe the session; they are not entropy-bit estimates.</p>
+        </div>
+        <p class="section-lede"><strong>Before reveal:</strong> BIP39 appends a checksum that catches some transcription errors; it does not encrypt the words. Custody depends on private, verified backups. A BIP39 passphrase, if supported, is separate from the mnemonic and creates different wallets. Device compromise can expose both.</p>
         <ul class="warning-list">
           <li>Close screen-sharing, recording, remote-access, and cloud-note software.</li>
           <li>Prefer writing the words on a durable physical backup.</li>
@@ -454,8 +560,8 @@
           <details><summary>Why collect driving movement?</summary><div class="detail-body"><p>Key transitions, high-resolution timing, frame jitter, position, velocity, steering, firing, and collisions form a deterministic binary transcript that is hashed as a supplemental source. <strong>Entropy Racer does not claim each action contributes a fixed number of entropy bits.</strong> The percentage shown is only a collection threshold.</p></div></details>
           <details><summary>What is WebCrypto?</summary><div class="detail-body"><p><code>crypto.getRandomValues()</code> is the browser's cryptographically secure pseudorandom generator interface and normally draws from operating-system randomness. It is not described here as guaranteed “true randomness.” If WebCrypto is unavailable or self-tests fail, generation is disabled with no fallback to <code>Math.random()</code>.</p></div></details>
           <details><summary>What is physical entropy?</summary><div class="detail-body"><p>Coin flips and fair dice can contribute a conceptually independent source. Heads and tails map to one bit. Die results 1–4 map to two bits; 5 and 6 are rejected to avoid modulo bias. Physical input is optional and is only as trustworthy as the object and the recording process.</p></div></details>
-          <details><summary>What is BIP39?</summary><div class="detail-body"><p>BIP39 standardizes mnemonics drawn from a 2,048-word list with a checksum. Twelve words encode 128 entropy bits plus 4 checksum bits; twenty-four encode 256 plus 8. Import compatibility varies with passphrases, derivation paths, script types, and wallet behavior. Confirm compatibility yourself before relying on an import.</p></div></details>
-          <details><summary>Why run this offline?</summary><div class="detail-body"><p>Remote dependencies, injected scripts, browser extensions, malware, clipboard monitoring, and screen capture can expose secrets. One inspectable local file with no network requests reduces some attack surfaces, but cannot make compromised hardware, an operating system, or a browser safe.</p></div></details>
+          <details><summary>What is BIP39?</summary><div class="detail-body"><p>A <strong>BIP39 mnemonic</strong> is the ordered 12 or 24 words representing entropy plus checksum. An optional <strong>BIP39 passphrase</strong> is separate secret input: every different passphrase derives a different wallet, including plausible typos. A <strong>derivation path</strong> tells wallet software which branch of keys to use. An <strong>address type</strong> controls the Bitcoin script/address format. <strong>Wallet compatibility</strong> means the importer agrees on all of those choices—not merely the word list. Confirm the entire workflow with disposable test data before relying on an import.</p></div></details>
+          <details><summary>Why run this offline?</summary><div class="detail-body"><p>Remote dependencies, injected scripts, browser extensions, malware, clipboard monitoring, and screen capture can expose secrets. One inspectable local file with no automatic network requests reduces some attack surfaces. Seeing <code>file://</code> in the address bar does not prove the computer is disconnected, and local mode cannot make compromised hardware, an operating system, or a browser safe.</p></div></details>
           <details><summary>Can I import the words elsewhere?</summary><div class="detail-body"><p>Many Bitcoin wallets support BIP39 import, but behavior varies. Entering words into software or an internet-connected device can expose them. Test compatibility with disposable test mnemonics and consult the target wallet's own documentation.</p></div></details>
           <details><summary>Exact entropy construction</summary><div class="detail-body"><p>Each part is framed with explicit byte lengths. The system component is SHA-256 over the domain <code>EntropyRacer-v1-system</code> and a fresh 256-bit WebCrypto value. The game and optional physical transcripts are independently hashed under their own domains. Those three 32-byte digests are hashed under <code>EntropyRacer-v1-final</code>, then a length-specific <code>EntropyRacer-v1-bip39-12</code> or <code>-24</code> derivation produces the required entropy bytes. The BIP39 checksum is computed and validated before display.</p></div></details>
           <details><summary>Threat model: what it can help with</summary><div class="detail-body"><p>The design reduces dependence on one randomness source, remote libraries, server-side generation, network APIs, and silent server storage. It uses fresh session randomness, explicit source separation, local test vectors, and a single-use generation state.</p></div></details>
@@ -2653,10 +2759,12 @@ zoo`;
     constructor() {
       this.systemEntropy = null;
       this.consumed = false;
+      this.busy = false;
     }
 
     beginSession() {
       if (!globalThis.crypto || typeof crypto.getRandomValues !== "function" || !crypto.subtle) throw new Error("WebCrypto unavailable");
+      if (this.busy) throw new Error("Entropy generation is already in progress");
       this.destroy();
       this.systemEntropy = new Uint8Array(32);
       // SECURITY: Never replace this with Math.random().
@@ -2667,11 +2775,15 @@ zoo`;
     async generate(wordCount, gameTranscript, physicalPayload) {
       if (this.consumed || !this.systemEntropy) throw new Error("Entropy session is unavailable or already consumed");
       if (wordCount !== 12 && wordCount !== 24) throw new Error("Invalid mnemonic length");
+      if (!(gameTranscript instanceof Uint8Array) || !(physicalPayload instanceof Uint8Array)) throw new Error("Invalid entropy transcript");
       // SECURITY: Lock before awaiting to prevent double-click and async races.
       this.consumed = true;
+      this.busy = true;
+      const sessionEntropy = this.systemEntropy;
+      this.systemEntropy = null;
       let systemComponent, gameComponent, physicalComponent, finalState, derived, entropy;
       try {
-        systemComponent = await domainHash("EntropyRacer-v1-system", this.systemEntropy);
+        systemComponent = await domainHash("EntropyRacer-v1-system", sessionEntropy);
         gameComponent = await domainHash("EntropyRacer-v1-game", gameTranscript);
         physicalComponent = await domainHash("EntropyRacer-v1-physical", physicalPayload);
         finalState = await domainHash("EntropyRacer-v1-final", systemComponent, gameComponent, physicalComponent);
@@ -2682,14 +2794,15 @@ zoo`;
         if (!(await Bip39.validate(words))) throw new Error("Generated mnemonic failed BIP39 validation");
         return words;
       } finally {
-        for (const value of [this.systemEntropy, systemComponent, gameComponent, physicalComponent, finalState, derived, entropy]) {
+        for (const value of [sessionEntropy, systemComponent, gameComponent, physicalComponent, finalState, derived, entropy]) {
           if (value instanceof Uint8Array) value.fill(0);
         }
-        this.systemEntropy = null;
+        this.busy = false;
       }
     }
 
     destroy() {
+      if (this.busy) throw new Error("Cannot reset while entropy generation is in progress");
       if (this.systemEntropy) this.systemEntropy.fill(0);
       this.systemEntropy = null;
       this.consumed = false;
@@ -2711,6 +2824,8 @@ zoo`;
       this.count = 0;
       this.sequence = 0;
       this.startedAt = performance.now();
+      this.pausedAt = 0;
+      this.pausedDuration = 0;
       this.diversity = new Set();
       this.distance = 0;
       this.complete = false;
@@ -2730,7 +2845,7 @@ zoo`;
       view.setUint8(1, type & 255);
       view.setUint16(2, state.keyMask & 65535, false);
       view.setUint32(4, this.sequence++ >>> 0, false);
-      view.setFloat64(8, performance.now(), false);
+      view.setFloat64(8, this.activeNow(), false);
       view.setFloat64(16, state.dt || 0, false);
       view.setFloat64(24, state.x || 0, false);
       view.setFloat64(32, state.y || 0, false);
@@ -2747,17 +2862,29 @@ zoo`;
     }
 
     checkReady() {
-      const elapsed = performance.now() - this.startedAt;
+      const elapsed = this.activeNow() - this.startedAt;
       this.complete = this.count >= 1200 && elapsed >= 15000 && this.diversity.size >= 4 && this.distance >= 800;
       return this.complete;
     }
 
     stats() {
-      const elapsed = performance.now() - this.startedAt;
+      const elapsed = this.activeNow() - this.startedAt;
       const components = [Math.min(this.count / 1200, 1), Math.min(elapsed / 15000, 1), Math.min(this.diversity.size / 4, 1), Math.min(this.distance / 800, 1)];
       let progress = components.reduce((sum, value) => sum + value, 0) / components.length;
       if (!this.complete) progress = Math.min(progress, .99);
       return { count: this.count, diversity: this.diversity.size, distance: this.distance, elapsed, progress, complete: this.complete };
+    }
+
+    activeNow() {
+      const now = performance.now();
+      return now - this.pausedDuration - (this.pausedAt ? now - this.pausedAt : 0);
+    }
+
+    pause() { if (!this.pausedAt) this.pausedAt = performance.now(); }
+    resume() {
+      if (!this.pausedAt) return;
+      this.pausedDuration += performance.now() - this.pausedAt;
+      this.pausedAt = 0;
     }
 
     exportTranscript() {
@@ -2773,16 +2900,35 @@ zoo`;
       this.diversity = new Set();
       this.distance = 0;
       this.complete = false;
+      this.pausedAt = 0;
+      this.pausedDuration = 0;
     }
   }
 
   class PhysicalEntropyCollector {
-    constructor() { this.bits = []; }
-    addCoin(bit) { if (this.bits.length < 256) this.bits.push(bit === 1 ? 1 : 0); }
+    constructor() { this.bits = []; this.coinCount = 0; this.acceptedDice = 0; this.rejectedDice = 0; this.history = []; }
+    remember(label, accepted) {
+      this.history.unshift({ label, accepted });
+      if (this.history.length > 8) this.history.length = 8;
+    }
+    addCoin(bit) {
+      if (bit !== 0 && bit !== 1) throw new Error("Invalid coin outcome");
+      if (this.bits.length >= 256) return false;
+      this.bits.push(bit); this.coinCount++;
+      this.remember(bit ? "TAILS · ACCEPTED" : "HEADS · ACCEPTED", true);
+      return true;
+    }
     addDie(face) {
-      if (face < 1 || face > 6) throw new Error("Invalid die face");
-      if (face > 4) return false;
-      if (this.bits.length <= 254) this.bits.push((face - 1) >> 1, (face - 1) & 1);
+      if (!Number.isInteger(face) || face < 1 || face > 6) throw new Error("Invalid die face");
+      if (face > 4) {
+        this.rejectedDice++;
+        this.remember(`DIE ${face} · REROLL`, false);
+        return false;
+      }
+      if (this.bits.length > 254) return false;
+      this.bits.push((face - 1) >> 1, (face - 1) & 1);
+      this.acceptedDice++;
+      this.remember(`DIE ${face} · ACCEPTED`, true);
       return true;
     }
     exportPayload(enabled) {
@@ -2791,7 +2937,10 @@ zoo`;
       for (let i = 0; i < bits.length; i++) packed[i >> 3] |= bits[i] << (7 - (i & 7));
       return concatBytes(u32(bits.length), packed);
     }
-    destroy() { this.bits.fill(0); this.bits.length = 0; }
+    destroy() {
+      this.bits.fill(0); this.bits.length = 0;
+      this.coinCount = 0; this.acceptedDice = 0; this.rejectedDice = 0; this.history.length = 0;
+    }
   }
 
   /* ========================================================================
@@ -2820,6 +2969,43 @@ zoo`;
     const zero256 = new Uint8Array(32);
     const words256 = await Bip39.entropyToWords(zero256);
     if (words256.join(" ") !== "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art" || !(await Bip39.validate(words256))) throw new Error("BIP39 256-bit vector failed");
+
+    const expectedDieBits = [[0,0],[0,1],[1,0],[1,1],[],[]];
+    for (let face = 1; face <= 6; face++) {
+      const physical = new PhysicalEntropyCollector();
+      const accepted = physical.addDie(face);
+      const expected = expectedDieBits[face - 1];
+      if (accepted !== (face <= 4) || physical.bits.length !== expected.length || physical.bits.some((bit, index) => bit !== expected[index])) throw new Error(`Die mapping test failed for face ${face}`);
+      if (face > 4 && (physical.bits.length !== 0 || physical.exportPayload(true).length !== 4)) throw new Error(`Rejected die ${face} contributed bits`);
+      physical.destroy();
+      if (physical.bits.length || physical.history.length || physical.acceptedDice || physical.rejectedDice) throw new Error("Physical collector reset test failed");
+    }
+
+    const sessionTest = new CryptoEngine();
+    const testGame = new Uint8Array([1,2,3]);
+    const testPhysical = new Uint8Array([0,0,0,0]);
+    sessionTest.beginSession();
+    const firstSystemCopy = sessionTest.systemEntropy.slice(), firstSystemReference = sessionTest.systemEntropy;
+    sessionTest.beginSession();
+    if (firstSystemReference.some(byte => byte !== 0) || constantTimeEqual(firstSystemCopy, sessionTest.systemEntropy)) throw new Error("Fresh-session randomness/reset test failed");
+    firstSystemCopy.fill(0);
+    const firstGeneration = sessionTest.generate(12, testGame, testPhysical);
+    let doubleGenerationRejected = false;
+    try { await sessionTest.generate(12, testGame, testPhysical); } catch (_) { doubleGenerationRejected = true; }
+    let concurrentResetRejected = false;
+    try { sessionTest.beginSession(); } catch (_) { concurrentResetRejected = true; }
+    const generated12 = await firstGeneration;
+    if (!doubleGenerationRejected || !concurrentResetRejected || !(await Bip39.validate(generated12))) throw new Error("Single-use 12-word session test failed");
+    generated12.fill("");
+    sessionTest.beginSession();
+    const generated24 = await sessionTest.generate(24, testGame, testPhysical);
+    if (!(await Bip39.validate(generated24))) throw new Error("Fresh 24-word session test failed");
+    generated24.fill("");
+    sessionTest.destroy();
+    let staleSessionRejected = false;
+    try { await sessionTest.generate(12, testGame, testPhysical); } catch (_) { staleSessionRejected = true; }
+    testGame.fill(0); testPhysical.fill(0);
+    if (!staleSessionRejected) throw new Error("Destroyed session test failed");
     zero128.fill(0); zero256.fill(0); frameA.fill(0); frameB.fill(0); words128.fill(""); words256.fill("");
     return true;
   }
@@ -2870,6 +3056,31 @@ zoo`;
       this.enemies = [];
       this.lasers = [];
       this.particles = [];
+      this.targets = [];
+      this.powerups = [];
+      this.checkpoints = [];
+      this.driftZones = [];
+      this.gate = null;
+      this.inputSequence = [];
+      this.objectives = ["gate","checkpoint","targets","drift","near"];
+      this.objectiveIndex = 0;
+      this.objectiveProgress = 0;
+      this.score = 0;
+      this.flow = 0;
+      this.flowPeak = 0;
+      this.objectivesCompleted = 0;
+      this.nearMisses = 0;
+      this.driftTime = 0;
+      this.checkpointsPassed = 0;
+      this.gatesPassed = 0;
+      this.targetHits = 0;
+      this.powerup = null;
+      this.powerupUntil = 0;
+      this.shake = 0;
+      this.flash = 0;
+      this.focusPaused = false;
+      this.reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      this.hudAt = 0;
       this.frame = 0;
       this.lastTime = performance.now();
       this.lastShot = 0;
@@ -2879,10 +3090,14 @@ zoo`;
       this.resizeObserver.observe(canvas.parentElement);
       this.boundDown = event => this.onKey(event, true);
       this.boundUp = event => this.onKey(event, false);
+      this.boundBlur = () => this.pauseForFocus();
       window.addEventListener("keydown", this.boundDown, { passive: false });
       window.addEventListener("keyup", this.boundUp, { passive: false });
-      for (let i = 0; i < 11; i++) this.enemies.push(this.spawnEnemy(i));
+      window.addEventListener("blur", this.boundBlur);
+      for (let i = 0; i < 10; i++) this.enemies.push(this.spawnEnemy(i));
+      this.resetEncounters();
       this.resize();
+      this.updateHud();
     }
 
     resize() {
@@ -2902,29 +3117,105 @@ zoo`;
     state(dt = 0) { return { keyMask: this.keyMask(), dt, x: this.player.x, y: this.player.y, vx: this.player.vx, vy: this.player.vy, heading: this.player.heading, frame: this.frame }; }
 
     onKey(event, down) {
-      if (!this.running || !["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(event.code)) return;
+      if (!["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(event.code)) return;
+      if (down && this.focusPaused && !document.hidden) this.start(false);
+      if (!this.running) return;
       event.preventDefault();
       const changed = down ? !this.keys.has(event.code) : this.keys.has(event.code);
       if (down) this.keys.add(event.code); else this.keys.delete(event.code);
       if (changed) this.collector.record(down ? 2 : 3, this.state(), event.code === "Space" ? 5 : event.code.length, down ? 1 : 0);
+      if (changed && down && event.code.startsWith("Arrow")) {
+        this.inputSequence.push(event.code.slice(5).toUpperCase());
+        if (this.inputSequence.length > 8) this.inputSequence.shift();
+      }
       if (down && event.code === "Space") this.fire();
+    }
+
+    placeAhead(distance = 650, spread = 350) {
+      const angle = this.player.heading + this.rng.range(-1.1, 1.1);
+      return { x: this.player.x + Math.cos(angle) * distance + this.rng.range(-spread, spread), y: this.player.y + Math.sin(angle) * distance + this.rng.range(-spread, spread) };
+    }
+
+    resetEncounters() {
+      const gatePos = this.placeAhead(620, 160);
+      this.gate = { ...gatePos, angle: this.rng.range(0, Math.PI * 2), sequence: ["LEFT","RIGHT","UP"], passed: false };
+      this.checkpoints.length = 0;
+      let anchor = this.placeAhead(430, 140);
+      for (let i = 0; i < 4; i++) {
+        anchor = { x: anchor.x + this.rng.range(240, 390), y: anchor.y + this.rng.range(-260, 260) };
+        this.checkpoints.push({ ...anchor, active: i === 0 });
+      }
+      this.targets.length = 0;
+      const formation = this.placeAhead(700, 220);
+      for (let i = 0; i < 6; i++) this.targets.push({ x: formation.x, y: formation.y, cx: formation.x, cy: formation.y, phase: i / 6 * Math.PI * 2, hit: 0, alive: true });
+      this.driftZones.length = 0;
+      for (let i = 0; i < 2; i++) this.driftZones.push({ ...this.placeAhead(500 + i * 380, 260), radius: 145, charge: 0 });
+      this.powerups.length = 0;
+      ["rapid","wide","thrust"].forEach((type, i) => this.powerups.push({ ...this.placeAhead(540 + i * 280, 300), type, active: true }));
+      this.objectiveProgress = 0;
+    }
+
+    objectiveName() {
+      const names = {
+        gate: "Match LEFT → RIGHT → UP, then cross the entropy gate",
+        checkpoint: `Link glowing hash checkpoints (${Math.min(this.objectiveProgress,4)}/4)`,
+        targets: `Hit the moving formation (${Math.min(this.objectiveProgress,5)}/5)`,
+        drift: "Hold a controlled drift inside a violet zone",
+        near: "Thread a close near-miss without contact"
+      };
+      return names[this.objectives[this.objectiveIndex]];
+    }
+
+    reward(points, type) {
+      const multiplier = Math.min(5, 1 + Math.floor(this.flow / 24));
+      this.score += points * multiplier;
+      this.flow = Math.min(100, this.flow + Math.max(5, points / 8));
+      this.flowPeak = Math.max(this.flowPeak, this.flow);
+      this.collector.record(7, this.state(), points, multiplier);
+      if (type === this.objectives[this.objectiveIndex]) {
+        this.objectivesCompleted++;
+        this.objectiveIndex = (this.objectiveIndex + 1) % this.objectives.length;
+        this.objectiveProgress = 0;
+        const next = this.objectives[this.objectiveIndex];
+        if (next === "gate") this.resetEncounters();
+        else if (next === "checkpoint") this.checkpoints.forEach((checkpoint, index) => { checkpoint.active = index === 0; });
+        else if (next === "targets") this.targets.forEach(target => { target.alive = true; });
+        else if (next === "drift") this.driftZones.forEach(zone => { zone.charge = 0; });
+        this.audio.tone(620, .12, "triangle", .025);
+      }
+      this.updateHud();
+    }
+
+    updateHud(now = performance.now()) {
+      if (now - this.hudAt < 70) return;
+      this.hudAt = now;
+      const multiplier = Math.min(5, 1 + Math.floor(this.flow / 24));
+      document.getElementById("objective-text").textContent = this.objectiveName();
+      document.getElementById("flow-meter").style.width = `${this.flow}%`;
+      document.getElementById("flow-label").textContent = `x${multiplier} · ${this.score}`;
     }
 
     spawnEnemy(index) {
       const angle = this.rng.range(0, Math.PI * 2);
       const radius = this.rng.range(500, 1300);
-      return { x: this.player.x + Math.cos(angle) * radius, y: this.player.y + Math.sin(angle) * radius, vx: this.rng.range(-40, 40), vy: this.rng.range(-40, 40), heading: this.rng.range(0, Math.PI * 2), hue: index % 2 ? "#a970ff" : "#3994ff", phase: this.rng.range(0, 100), hit: 0 };
+      const type = ["hunter","weaver","cruiser"][index % 3];
+      return { x: this.player.x + Math.cos(angle) * radius, y: this.player.y + Math.sin(angle) * radius, vx: this.rng.range(-40, 40), vy: this.rng.range(-40, 40), heading: this.rng.range(0, Math.PI * 2), type, hue: type === "hunter" ? "#ff5578" : type === "weaver" ? "#a970ff" : "#3994ff", phase: this.rng.range(0, 100), hit: 0, bump: 0, near: false };
     }
 
     recycleEnemy(enemy) { Object.assign(enemy, this.spawnEnemy(Math.floor(this.rng.range(0, 20)))); }
 
     fire() {
       const now = performance.now();
-      if (now - this.lastShot < 115) return;
+      const rapid = this.powerup === "rapid" && now < this.powerupUntil;
+      if (now - this.lastShot < (rapid ? 62 : 115)) return;
       this.lastShot = now;
       const p = this.player;
-      this.lasers.push({ x: p.x + Math.cos(p.heading) * 24, y: p.y + Math.sin(p.heading) * 24, vx: p.vx + Math.cos(p.heading) * 720, vy: p.vy + Math.sin(p.heading) * 720, life: .85 });
-      if (this.lasers.length > 28) this.lasers.shift();
+      const angles = this.powerup === "wide" && now < this.powerupUntil ? [-.12,0,.12] : [0];
+      for (const offset of angles) {
+        const angle = p.heading + offset;
+        this.lasers.push({ x: p.x + Math.cos(angle) * 24, y: p.y + Math.sin(angle) * 24, vx: p.vx + Math.cos(angle) * 760, vy: p.vy + Math.sin(angle) * 760, life: .9 });
+      }
+      while (this.lasers.length > 36) this.lasers.shift();
       this.collector.record(4, this.state(), p.x, p.y);
       this.audio.tone(430, .045, "sawtooth", .018);
     }
@@ -2936,9 +3227,30 @@ zoo`;
       }
     }
 
-    start() { if (this.running) return; this.running = true; this.lastTime = performance.now(); this.canvas.focus(); this.loop(this.lastTime); }
-    pause() { this.running = false; this.keys.clear(); cancelAnimationFrame(this.raf); }
-    destroy() { this.pause(); this.resizeObserver.disconnect(); window.removeEventListener("keydown", this.boundDown); window.removeEventListener("keyup", this.boundUp); this.lasers.length = 0; this.enemies.length = 0; this.particles.length = 0; }
+    start(focus = true) {
+      if (this.running) return;
+      this.running = true; this.focusPaused = false; this.lastTime = performance.now();
+      this.collector.resume();
+      document.getElementById("pause-overlay").hidden = true;
+      if (focus) this.canvas.focus();
+      this.loop(this.lastTime);
+    }
+    pause() { this.running = false; this.keys.clear(); this.collector.pause(); cancelAnimationFrame(this.raf); }
+    pauseForFocus() {
+      if (!this.running) return;
+      this.pause(); this.focusPaused = true;
+      document.getElementById("pause-overlay").hidden = false;
+    }
+    destroy() {
+      this.pause(); this.focusPaused = false; this.resizeObserver.disconnect();
+      window.removeEventListener("keydown", this.boundDown); window.removeEventListener("keyup", this.boundUp); window.removeEventListener("blur", this.boundBlur);
+      document.getElementById("pause-overlay").hidden = true;
+      this.lasers.length = 0; this.enemies.length = 0; this.particles.length = 0; this.targets.length = 0; this.powerups.length = 0; this.checkpoints.length = 0; this.driftZones.length = 0;
+    }
+
+    stats() {
+      return { score: this.score, objectives: this.objectivesCompleted, nearMisses: this.nearMisses, driftSeconds: this.driftTime, checkpoints: this.checkpointsPassed, gates: this.gatesPassed, targetHits: this.targetHits, flowPeak: Math.round(this.flowPeak) };
+    }
 
     loop(now) {
       if (!this.running) return;
@@ -2953,38 +3265,60 @@ zoo`;
       this.frame++;
       const p = this.player;
       const beforeX = p.x, beforeY = p.y;
-      const speed = Math.hypot(p.vx, p.vy);
       const turn = (this.keys.has("ArrowRight") ? 1 : 0) - (this.keys.has("ArrowLeft") ? 1 : 0);
-      p.heading += turn * (2.45 + Math.min(speed / 340, 1.2)) * dt;
-      const thrust = (this.keys.has("ArrowUp") ? 1 : 0) - (this.keys.has("ArrowDown") ? .62 : 0);
-      p.vx += Math.cos(p.heading) * thrust * 380 * dt;
-      p.vy += Math.sin(p.heading) * thrust * 380 * dt;
-      const drag = Math.pow(.985, dt * 60);
-      p.vx *= drag; p.vy *= drag;
-      const cap = 520;
-      if (speed > cap) { p.vx *= cap / speed; p.vy *= cap / speed; }
+      let speed = Math.hypot(p.vx, p.vy);
+      p.heading += turn * (1.9 + Math.min(speed / 220, 1.65)) * dt;
+      const thrustPower = this.powerup === "thrust" && now < this.powerupUntil ? 560 : 430;
+      if (this.keys.has("ArrowUp")) { p.vx += Math.cos(p.heading) * thrustPower * dt; p.vy += Math.sin(p.heading) * thrustPower * dt; }
+      if (this.keys.has("ArrowDown")) {
+        const brake = Math.pow(.88, dt * 60); p.vx *= brake; p.vy *= brake;
+        if (speed < 24) { p.vx -= Math.cos(p.heading) * 105 * dt; p.vy -= Math.sin(p.heading) * 105 * dt; }
+      }
+      const forward = p.vx * Math.cos(p.heading) + p.vy * Math.sin(p.heading);
+      let lateral = -p.vx * Math.sin(p.heading) + p.vy * Math.cos(p.heading);
+      lateral *= Math.pow(turn && speed > 110 ? .975 : .89, dt * 60);
+      p.vx = Math.cos(p.heading) * forward - Math.sin(p.heading) * lateral;
+      p.vy = Math.sin(p.heading) * forward + Math.cos(p.heading) * lateral;
+      const drag = Math.pow(.991, dt * 60); p.vx *= drag; p.vy *= drag;
+      speed = Math.hypot(p.vx, p.vy);
+      const cap = this.powerup === "thrust" && now < this.powerupUntil ? 610 : 540;
+      if (speed > cap) { p.vx *= cap / speed; p.vy *= cap / speed; speed = cap; }
       p.x += p.vx * dt; p.y += p.vy * dt;
       this.collector.addDistance(Math.hypot(p.x - beforeX, p.y - beforeY));
       this.collector.record(1, this.state(dt), now - Math.floor(now), speed);
       if (this.keys.has("Space")) this.fire();
+      this.flow = Math.max(0, this.flow - dt * 2.2);
+      this.shake = Math.max(0, this.shake - dt * 22); this.flash = Math.max(0, this.flash - dt * 2.8);
+      if (this.powerup && now >= this.powerupUntil) this.powerup = null;
+      this.updateEncounters(dt, now, speed, turn, lateral);
+      this.updateHud(now);
 
       for (const enemy of this.enemies) {
-        const target = Math.atan2(p.y - enemy.y, p.x - enemy.x) + Math.sin(now * .0007 + enemy.phase) * .7;
+        const baseTarget = Math.atan2(p.y - enemy.y, p.x - enemy.x);
+        const target = enemy.type === "hunter" ? baseTarget : enemy.type === "weaver" ? baseTarget + Math.sin(now * .0018 + enemy.phase) * 1.25 : enemy.phase;
         let delta = ((target - enemy.heading + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-        enemy.heading += Math.max(-1.2 * dt, Math.min(1.2 * dt, delta));
-        const enemySpeed = 105 + Math.sin(enemy.phase + now * .001) * 35;
+        enemy.heading += Math.max(-1.35 * dt, Math.min(1.35 * dt, delta));
+        const enemySpeed = enemy.type === "hunter" ? 135 : enemy.type === "weaver" ? 110 : 72;
         enemy.vx += Math.cos(enemy.heading) * enemySpeed * dt;
         enemy.vy += Math.sin(enemy.heading) * enemySpeed * dt;
         enemy.vx *= Math.pow(.98, dt * 60); enemy.vy *= Math.pow(.98, dt * 60);
-        enemy.x += enemy.vx * dt; enemy.y += enemy.vy * dt; enemy.hit = Math.max(0, enemy.hit - dt);
+        enemy.x += enemy.vx * dt; enemy.y += enemy.vy * dt; enemy.hit = Math.max(0, enemy.hit - dt); enemy.bump = Math.max(0, enemy.bump - dt);
         const dist = Math.hypot(enemy.x - p.x, enemy.y - p.y);
         if (dist > 1700) this.recycleEnemy(enemy);
-        if (dist < 35) {
+        if (dist < 82 && dist > 39 && speed > 145 && !enemy.near) {
+          enemy.near = true; this.nearMisses++; this.objectiveProgress++;
+          this.burst(p.x, p.y, "#65f7a1", 8); this.audio.tone(520, .07, "sine", .018);
+          if (this.objectives[this.objectiveIndex] === "near") this.reward(90, "near"); else this.reward(24, "bonus");
+        } else if (dist > 125) enemy.near = false;
+        if (dist < 35 && !enemy.bump) {
+          enemy.bump = .45;
           const nx = (p.x - enemy.x) / Math.max(dist, 1), ny = (p.y - enemy.y) / Math.max(dist, 1);
           p.vx += nx * 130; p.vy += ny * 130; enemy.vx -= nx * 90; enemy.vy -= ny * 90;
           this.burst((p.x + enemy.x) / 2, (p.y + enemy.y) / 2, "#f7931a", 9);
           this.collector.record(6, this.state(dt), enemy.x, enemy.y);
           this.audio.tone(90, .08, "square", .018);
+          if (this.reducedMotion) this.flash = 1; else this.shake = 9;
+          this.flow = Math.max(0, this.flow - 12);
         }
       }
 
@@ -3001,12 +3335,79 @@ zoo`;
             remove = true;
           }
         }
+        for (const target of this.targets) {
+          if (!remove && target.alive && Math.hypot(laser.x - target.x, laser.y - target.y) < 24) {
+            target.alive = false; target.hit = .25; this.targetHits++;
+            this.burst(laser.x, laser.y, "#f7931a", 14); this.audio.tone(260, .08, "triangle", .022);
+            if (this.objectives[this.objectiveIndex] === "targets") {
+              this.objectiveProgress++;
+              if (this.objectiveProgress >= 5) this.reward(120, "targets"); else this.reward(22, "bonus");
+            } else this.reward(28, "bonus");
+            remove = true;
+          }
+        }
         if (remove) this.lasers.splice(i, 1);
       }
 
       for (let i = this.particles.length - 1; i >= 0; i--) {
         const particle = this.particles[i]; particle.x += particle.vx * dt; particle.y += particle.vy * dt; particle.vx *= .97; particle.vy *= .97; particle.life -= dt;
         if (particle.life <= 0) this.particles.splice(i, 1);
+      }
+    }
+
+    updateEncounters(dt, now, speed, turn, lateral) {
+      const p = this.player;
+      const sequenceLength = this.inputSequence.length;
+      const sequenceReady = sequenceLength >= 3 && this.inputSequence[sequenceLength - 3] === "LEFT" && this.inputSequence[sequenceLength - 2] === "RIGHT" && this.inputSequence[sequenceLength - 1] === "UP";
+      if (!this.gate.passed && sequenceReady && Math.hypot(p.x - this.gate.x, p.y - this.gate.y) < 92) {
+        this.gate.passed = true; this.gatesPassed++;
+        this.burst(this.gate.x, this.gate.y, "#65f7a1", 24); this.audio.tone(720, .12, "sine", .025);
+        this.reward(110, this.objectives[this.objectiveIndex] === "gate" ? "gate" : "bonus");
+        const next = this.placeAhead(760, 220); Object.assign(this.gate, next, { angle: this.rng.range(0, Math.PI * 2), passed: false });
+        this.inputSequence.length = 0;
+      }
+
+      const activeCheckpoint = this.checkpoints.findIndex(checkpoint => checkpoint.active);
+      if (activeCheckpoint >= 0 && Math.hypot(p.x - this.checkpoints[activeCheckpoint].x, p.y - this.checkpoints[activeCheckpoint].y) < 64) {
+        this.checkpoints[activeCheckpoint].active = false; this.checkpointsPassed++;
+        this.burst(p.x, p.y, "#4ce9f5", 12); this.audio.tone(380 + activeCheckpoint * 70, .07, "sine", .018);
+        if (this.objectives[this.objectiveIndex] === "checkpoint") this.objectiveProgress++;
+        if (activeCheckpoint === this.checkpoints.length - 1) {
+          this.reward(125, this.objectives[this.objectiveIndex] === "checkpoint" ? "checkpoint" : "bonus");
+          let anchor = this.placeAhead(500, 180);
+          this.checkpoints.forEach((checkpoint, i) => { anchor = { x: anchor.x + this.rng.range(230,360), y: anchor.y + this.rng.range(-240,240) }; Object.assign(checkpoint, anchor, { active: i === 0 }); });
+        } else this.checkpoints[activeCheckpoint + 1].active = true;
+      }
+
+      for (const zone of this.driftZones) {
+        const inside = Math.hypot(p.x - zone.x, p.y - zone.y) < zone.radius;
+        if (inside && speed > 150 && turn && Math.abs(lateral) > 34) {
+          zone.charge += dt; this.driftTime += dt; this.flow = Math.min(100, this.flow + dt * 8);
+          if (zone.charge >= 1.15) {
+            zone.charge = 0; this.burst(p.x, p.y, "#a970ff", 18);
+            this.reward(100, this.objectives[this.objectiveIndex] === "drift" ? "drift" : "bonus");
+            Object.assign(zone, this.placeAhead(700, 300));
+          }
+        } else zone.charge = Math.max(0, zone.charge - dt * .35);
+      }
+
+      for (const target of this.targets) {
+        if (!target.alive) continue;
+        target.phase += dt * .7;
+        target.x = target.cx + Math.cos(target.phase) * 125;
+        target.y = target.cy + Math.sin(target.phase * 1.7) * 88;
+      }
+      if (!this.targets.some(target => target.alive)) {
+        const formation = this.placeAhead(720, 220);
+        this.targets.forEach((target, i) => Object.assign(target, { x: formation.x, y: formation.y, cx: formation.x, cy: formation.y, phase: i / this.targets.length * Math.PI * 2, alive: true, hit: 0 }));
+      }
+
+      for (const pickup of this.powerups) {
+        if (pickup.active && Math.hypot(p.x - pickup.x, p.y - pickup.y) < 40) {
+          pickup.active = false; this.powerup = pickup.type; this.powerupUntil = now + 8000;
+          this.burst(pickup.x, pickup.y, "#ffffff", 18); this.audio.tone(840, .11, "sine", .02); this.reward(35, "bonus");
+        }
+        if (!pickup.active && now > this.powerupUntil + 2500) Object.assign(pickup, this.placeAhead(620, 320), { active: true });
       }
     }
 
@@ -3017,6 +3418,8 @@ zoo`;
     draw(now) {
       const c = this.ctx, w = this.width, h = this.height;
       c.fillStyle = "#02050a"; c.fillRect(0, 0, w, h);
+      c.save();
+      if (this.shake && !this.reducedMotion) c.translate(this.rng.range(-this.shake, this.shake), this.rng.range(-this.shake, this.shake));
       const grid = 120, startX = Math.floor((this.player.x - w / 2) / grid) - 1, endX = Math.ceil((this.player.x + w / 2) / grid) + 1, startY = Math.floor((this.player.y - h / 2) / grid) - 1, endY = Math.ceil((this.player.y + h / 2) / grid) + 1;
       c.lineWidth = 1; c.strokeStyle = "rgba(66,168,215,.095)"; c.beginPath();
       for (let gx = startX; gx <= endX; gx++) { const sx = gx * grid - this.player.x + w / 2; c.moveTo(sx, 0); c.lineTo(sx, h); }
@@ -3034,10 +3437,41 @@ zoo`;
       const laneY = (Math.floor(this.player.y / 720) * 720) - this.player.y + h / 2;
       c.beginPath(); c.moveTo(0, laneY); c.lineTo(w, laneY); c.stroke(); c.setLineDash([]);
 
+      for (const zone of this.driftZones) {
+        const s = this.worldToScreen(zone.x, zone.y);
+        c.fillStyle = "rgba(169,112,255,.06)"; c.strokeStyle = "rgba(169,112,255,.48)"; c.lineWidth = 2;
+        c.beginPath(); c.arc(s.x, s.y, zone.radius, 0, Math.PI * 2); c.fill(); c.stroke();
+        if (zone.charge) { c.strokeStyle = "#a970ff"; c.lineWidth = 5; c.beginPath(); c.arc(s.x, s.y, zone.radius - 7, -.5 * Math.PI, (-.5 + Math.min(zone.charge / 1.15, 1) * 2) * Math.PI); c.stroke(); }
+      }
+
+      c.strokeStyle = "rgba(76,233,245,.36)"; c.lineWidth = 3; c.shadowColor = "#4ce9f5"; c.shadowBlur = 12; c.beginPath();
+      this.checkpoints.forEach((checkpoint, index) => { const s = this.worldToScreen(checkpoint.x, checkpoint.y); if (index) c.lineTo(s.x, s.y); else c.moveTo(s.x, s.y); }); c.stroke(); c.shadowBlur = 0;
+      for (let i = 0; i < this.checkpoints.length; i++) {
+        const checkpoint = this.checkpoints[i], s = this.worldToScreen(checkpoint.x, checkpoint.y);
+        c.strokeStyle = checkpoint.active ? "#4ce9f5" : "rgba(76,233,245,.25)"; c.lineWidth = checkpoint.active ? 4 : 2; c.strokeRect(s.x - 19, s.y - 19, 38, 38);
+        c.fillStyle = checkpoint.active ? "#fff" : "#7390a6"; c.font = "bold 10px monospace"; c.textAlign = "center"; c.fillText(`H${i + 1}`, s.x, s.y + 4); c.textAlign = "left";
+      }
+
+      if (this.gate) {
+        const s = this.worldToScreen(this.gate.x, this.gate.y); c.save(); c.translate(s.x, s.y); c.rotate(this.gate.angle);
+        c.strokeStyle = "#65f7a1"; c.lineWidth = 5; c.shadowColor = "#65f7a1"; c.shadowBlur = 14; c.beginPath(); c.moveTo(0,-70); c.lineTo(0,-25); c.moveTo(0,25); c.lineTo(0,70); c.stroke(); c.shadowBlur = 0; c.restore();
+        c.fillStyle = "#bfffd7"; c.font = "bold 9px monospace"; c.textAlign = "center"; c.fillText("← → ↑  ENTROPY GATE", s.x, s.y - 82); c.textAlign = "left";
+      }
+
+      for (const target of this.targets) if (target.alive) {
+        const s = this.worldToScreen(target.x, target.y); c.strokeStyle = "#f7931a"; c.lineWidth = 2; c.beginPath(); c.arc(s.x, s.y, 18, 0, Math.PI * 2); c.moveTo(s.x - 25, s.y); c.lineTo(s.x + 25, s.y); c.moveTo(s.x, s.y - 25); c.lineTo(s.x, s.y + 25); c.stroke();
+      }
+
+      for (const pickup of this.powerups) if (pickup.active) {
+        const s = this.worldToScreen(pickup.x, pickup.y), color = pickup.type === "rapid" ? "#4ce9f5" : pickup.type === "wide" ? "#a970ff" : "#65f7a1";
+        c.save(); c.translate(s.x, s.y); c.rotate(now * .001); c.strokeStyle = color; c.lineWidth = 3; c.shadowColor = color; c.shadowBlur = 13; c.strokeRect(-15,-15,30,30); c.restore(); c.shadowBlur = 0;
+        c.fillStyle = color; c.font = "bold 9px monospace"; c.textAlign = "center"; c.fillText(pickup.type.toUpperCase(), s.x, s.y + 31); c.textAlign = "left";
+      }
+
       for (const laser of this.lasers) { const s = this.worldToScreen(laser.x, laser.y); c.strokeStyle = "#4ce9f5"; c.lineWidth = 2; c.shadowColor = "#4ce9f5"; c.shadowBlur = 12; c.beginPath(); c.moveTo(s.x, s.y); c.lineTo(s.x - laser.vx * .022, s.y - laser.vy * .022); c.stroke(); }
       c.shadowBlur = 0;
 
-      for (const enemy of this.enemies) { const s = this.worldToScreen(enemy.x, enemy.y); this.drawCar(s.x, s.y, enemy.heading, enemy.hit > 0 ? "#ffffff" : enemy.hue, false); }
+      for (const enemy of this.enemies) { const s = this.worldToScreen(enemy.x, enemy.y); this.drawCar(s.x, s.y, enemy.heading, enemy.hit > 0 ? "#ffffff" : enemy.hue, false, enemy.type); }
       for (const particle of this.particles) { const s = this.worldToScreen(particle.x, particle.y); c.globalAlpha = Math.max(0, particle.life / particle.max); c.fillStyle = particle.color; c.fillRect(s.x, s.y, particle.size, particle.size); }
       c.globalAlpha = 1;
 
@@ -3046,16 +3480,24 @@ zoo`;
         c.strokeStyle = "rgba(247,147,26,.24)"; c.lineWidth = 3; c.beginPath(); c.moveTo(w/2 - Math.cos(this.player.heading)*20, h/2 - Math.sin(this.player.heading)*20); c.lineTo(w/2 - Math.cos(this.player.heading)*(30 + speed*.08), h/2 - Math.sin(this.player.heading)*(30 + speed*.08)); c.stroke();
       }
       this.drawCar(w / 2, h / 2, this.player.heading, "#f7931a", true);
+      c.restore();
 
       c.fillStyle = "rgba(2,5,10,.7)"; c.fillRect(14, 14, 150, 50);
       c.fillStyle = "#6f879e"; c.font = "10px monospace"; c.fillText("VECTOR VELOCITY", 25, 32);
       c.fillStyle = "#ffffff"; c.font = "bold 17px monospace"; c.fillText(String(Math.round(speed)).padStart(3, "0") + " u/s", 25, 54);
       c.fillStyle = "rgba(76,233,245,.5)"; c.font = "10px monospace"; c.textAlign = "right"; c.fillText("BLOCK " + Math.abs(Math.floor(this.player.y / 720)).toString(16).toUpperCase().padStart(6,"0"), w - 18, 28); c.textAlign = "left";
+      if (this.powerup && now < this.powerupUntil) { c.fillStyle = "#65f7a1"; c.font = "bold 10px monospace"; c.fillText(`${this.powerup.toUpperCase()} BOOST ${(Math.max(0,this.powerupUntil-now)/1000).toFixed(1)}s`, 25, 81); }
+      if (this.flash) { c.strokeStyle = `rgba(255,85,120,${Math.min(this.flash,.8)})`; c.lineWidth = 8; c.strokeRect(4,4,w-8,h-8); }
     }
 
-    drawCar(x, y, angle, color, player) {
+    drawCar(x, y, angle, color, player, type = "racer") {
       const c = this.ctx; c.save(); c.translate(x, y); c.rotate(angle); c.shadowColor = color; c.shadowBlur = player ? 18 : 8;
-      c.fillStyle = color; c.beginPath(); c.moveTo(25, 0); c.lineTo(9, -13); c.lineTo(-19, -11); c.lineTo(-25, -5); c.lineTo(-25, 5); c.lineTo(-19, 11); c.lineTo(9, 13); c.closePath(); c.fill();
+      c.fillStyle = color; c.beginPath();
+      if (type === "hunter") { c.moveTo(27,0); c.lineTo(-18,-16); c.lineTo(-8,0); c.lineTo(-18,16); }
+      else if (type === "weaver") { c.moveTo(23,0); c.lineTo(5,-17); c.lineTo(-22,-7); c.lineTo(-12,0); c.lineTo(-22,7); c.lineTo(5,17); }
+      else if (type === "cruiser") { c.moveTo(22,-10); c.lineTo(22,10); c.lineTo(-22,15); c.lineTo(-28,0); c.lineTo(-22,-15); }
+      else { c.moveTo(25, 0); c.lineTo(9, -13); c.lineTo(-19, -11); c.lineTo(-25, -5); c.lineTo(-25, 5); c.lineTo(-19, 11); c.lineTo(9, 13); }
+      c.closePath(); c.fill();
       c.shadowBlur = 0; c.fillStyle = "#071019"; c.fillRect(-5, -9, 12, 18); c.fillStyle = player ? "#fff0d5" : "#c9e7ff"; c.fillRect(14, -6, 5, 12);
       c.fillStyle = "#020407"; c.fillRect(-13,-15,8,5); c.fillRect(8,-15,8,5); c.fillRect(-13,10,8,5); c.fillRect(8,10,8,5); c.restore();
     }
@@ -3078,6 +3520,8 @@ zoo`;
       this.mnemonicWords = null;
       this.uiTimer = 0;
       this.generating = false;
+      this.lessonsShown = new Set();
+      this.sessionCompleteAnnounced = false;
       this.$ = id => document.getElementById(id);
       this.bind();
       this.environmentStatus();
@@ -3085,7 +3529,14 @@ zoo`;
     }
 
     bind() {
-      document.querySelectorAll(".choice").forEach(button => button.addEventListener("click", () => this.selectLength(Number(button.dataset.words))));
+      const choices = [...document.querySelectorAll(".choice")];
+      choices.forEach((button, index) => {
+        button.addEventListener("click", () => this.selectLength(Number(button.dataset.words)));
+        button.addEventListener("keydown", event => {
+          if (!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(event.code)) return;
+          event.preventDefault(); const next = choices[index ? 0 : 1]; next.focus(); this.selectLength(Number(next.dataset.words));
+        });
+      });
       this.$("start-button").addEventListener("click", () => this.startSession());
       this.$("reset-button").addEventListener("click", () => this.abortSession());
       this.$("generate-button").addEventListener("click", () => this.openConfirmation());
@@ -3093,18 +3544,54 @@ zoo`;
       this.$("reveal-button").addEventListener("click", () => this.generateAndReveal());
       this.$("destroy-button").addEventListener("click", () => this.destroyAndReset());
       this.$("mute-button").addEventListener("click", () => this.toggleMute());
+      this.$("lesson-close").addEventListener("click", () => { this.$("lesson-card").hidden = true; this.$("game-canvas").focus(); });
+      this.$("setup-lesson-close").addEventListener("click", () => { this.$("setup-lesson").hidden = true; });
       this.$("physical-toggle").addEventListener("change", event => {
         this.$("physical-controls").hidden = !event.target.checked;
+        if (event.target.checked) this.showLesson("physical", "Independent input, honestly recorded", "A fair coin or die can add a conceptually independent source. Die faces 5 and 6 must be rejected to avoid bias; rejection adds zero bits. Software cannot verify the physical process.");
         this.updateUi();
       });
       document.querySelectorAll("[data-coin]").forEach(button => button.addEventListener("click", () => {
-        this.physicalCollector.addCoin(Number(button.dataset.coin)); this.$("physical-note").textContent = button.dataset.coin === "0" ? "Heads recorded as 0." : "Tails recorded as 1."; this.updateUi();
+        const added = this.physicalCollector.addCoin(Number(button.dataset.coin));
+        this.$("physical-note").textContent = added ? (button.dataset.coin === "0" ? "Heads accepted as 0." : "Tails accepted as 1.") : "Physical input is full; no more outcomes can be recorded.";
+        this.updateUi();
       }));
       document.querySelectorAll("[data-die]").forEach(button => button.addEventListener("click", () => {
         const face = Number(button.dataset.die); const accepted = this.physicalCollector.addDie(face);
-        this.$("physical-note").textContent = accepted ? `Die ${face} accepted as ${(face - 1).toString(2).padStart(2,"0")}.` : `Die ${face} rejected. Roll again; no bits were added.`; this.updateUi();
+        this.animateDie(face, accepted);
+        this.$("physical-note").textContent = accepted ? `Die ${face} accepted as ${(face - 1).toString(2).padStart(2,"0")}.` : `Die ${face} rejected correctly. No bits added—roll again.`; this.updateUi();
       }));
-      document.addEventListener("visibilitychange", () => { if (document.hidden && this.game) this.game.keys.clear(); });
+      document.querySelectorAll("[data-pipeline]").forEach(button => button.addEventListener("click", () => this.explainPipeline(button.dataset.pipeline, button)));
+      document.addEventListener("visibilitychange", () => { if (document.hidden && this.game) this.game.pauseForFocus(); });
+    }
+
+    showLesson(key, title, text) {
+      if (this.lessonsShown.has(key)) return;
+      this.lessonsShown.add(key);
+      this.$("lesson-title").textContent = title;
+      this.$("lesson-text").textContent = text;
+      this.$("lesson-card").hidden = false;
+    }
+
+    animateDie(face, accepted) {
+      const machine = this.$("die-machine"), token = this.$("die-token");
+      token.textContent = String(face); machine.className = "die-machine";
+      void machine.offsetWidth;
+      machine.classList.add(accepted ? "animating" : "rejecting");
+    }
+
+    explainPipeline(key, button) {
+      const notes = {
+        system: "The browser CSPRNG supplies the foundational secret randomness. It is designed for security, but it is not proof of “true randomness” or an uncompromised device.",
+        game: "Timing, key changes, movement, and encounters form a supplemental transcript. Human actions have no known fixed entropy value, so event counts are never labeled entropy bits.",
+        physical: "Optional coin or fair-die input is separately recorded and framed. Its independence depends on the object and honest sequential entry; software cannot verify either.",
+        components: "Each source is length-framed and SHA-256 hashed under its own domain label. Source separation prevents ambiguous concatenation and keeps one source from being treated as another.",
+        final: "The three fixed-size component digests are length-framed and hashed again under a separate final domain. No live digest or secret byte is shown here.",
+        entropy: "A length-specific domain derives exactly 128 bits for 12 words or 256 bits for 24 words. Gameplay supplements WebCrypto; it never replaces it.",
+        words: "BIP39 appends 4 or 8 checksum bits, splits the result into 11-bit positions, and maps them through the verified 2,048-word list. The checksum detects some errors; it is not encryption."
+      };
+      document.querySelectorAll("[data-pipeline]").forEach(node => node.setAttribute("aria-pressed", String(node === button)));
+      this.$("pipeline-note").textContent = notes[key];
     }
 
     environmentStatus() {
@@ -3148,6 +3635,10 @@ zoo`;
         button.classList.toggle("selected", selected); button.setAttribute("aria-checked", String(selected));
       });
       this.$("tech-mode").textContent = `${count} WORD`;
+      const setupLesson = this.$("setup-lesson");
+      setupLesson.querySelector(".eyebrow").textContent = `Before you start · ${count}-word mnemonic`;
+      setupLesson.querySelector("p").textContent = count === 12 ? "Twelve words encode 128 entropy bits plus a 4-bit BIP39 checksum. This standard size is widely used, but backup custody, device integrity, address type, derivation path, passphrase use, and wallet compatibility still matter." : "Twenty-four words encode 256 entropy bits plus an 8-bit BIP39 checksum. The larger entropy input means more words to record correctly; it does not compensate for a compromised device, exposed backup, or incompatible wallet settings.";
+      setupLesson.hidden = false;
       this.updateStartButton();
     }
 
@@ -3156,15 +3647,19 @@ zoo`;
     showOnly(id) {
       ["setup-screen","game-screen","confirm-screen","reveal-screen"].forEach(screen => this.$(screen).hidden = screen !== id);
       this.$("hero").hidden = id !== "setup-screen";
-      scrollTo({ top: 0, behavior: "smooth" });
+      scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     }
 
     startSession() {
-      if (!this.selfTestsPassed || !this.wordCount) return;
+      if (!this.selfTestsPassed || !this.wordCount || this.game || this.cryptoEngine.systemEntropy) return;
       try {
         this.cryptoEngine.beginSession();
         this.gameCollector.reset(); this.physicalCollector.destroy();
+        this.lessonsShown.clear(); this.sessionCompleteAnnounced = false; this.lastPhysicalHistory = "";
         this.$("physical-toggle").checked = false; this.$("physical-controls").hidden = true;
+        this.$("physical-note").textContent = "Enter outcomes exactly as they occur. Never cherry-pick.";
+        this.$("die-machine").className = "die-machine"; this.$("die-token").textContent = "–";
+        this.$("setup-lesson").hidden = true;
         this.$("mode-label").textContent = `${this.wordCount}-word mode`;
         this.$("tech-mode").textContent = `${this.wordCount} WORD`;
         this.$("tech-system").textContent = "INITIALIZED";
@@ -3172,6 +3667,7 @@ zoo`;
         this.showOnly("game-screen");
         this.game = new GameEngine(this.$("game-canvas"), this.gameCollector, this.audio);
         this.game.start();
+        this.showLesson("csprng", "Fresh system randomness initialized", "WebCrypto created a new 256-bit CSPRNG value for this explicit session. A CSPRNG is engineered to be unpredictable; it is not proof of physical “true randomness” or a clean device.");
         clearInterval(this.uiTimer); this.uiTimer = setInterval(() => this.updateUi(), 120);
         this.updateUi();
       } catch (_) {
@@ -3189,18 +3685,45 @@ zoo`;
       this.$("tech-events").textContent = stats.count.toLocaleString();
       const bits = this.physicalCollector.bits.length;
       const physicalOn = this.$("physical-toggle").checked;
-      this.$("physical-value").textContent = `${physicalOn ? "ENABLED" : "OPTIONAL"} · ${bits} BITS`;
+      this.$("physical-value").textContent = `${physicalOn ? "ENABLED" : "OPTIONAL"} · ${bits} BITS RECORDED`;
       this.$("physical-meter").style.width = `${Math.min(bits / 256 * 100, 100)}%`;
-      this.$("tech-physical").textContent = physicalOn ? `${bits} BITS CONTRIBUTED` : "NOT USED";
+      this.$("tech-physical").textContent = physicalOn ? `${bits} BITS RECORDED` : "NOT USED";
+      this.$("accepted-count").textContent = String(this.physicalCollector.acceptedDice);
+      this.$("rejected-count").textContent = String(this.physicalCollector.rejectedDice);
+      const historyKey = this.physicalCollector.history.map(item => item.label).join("|");
+      if (historyKey !== this.lastPhysicalHistory) {
+        this.lastPhysicalHistory = historyKey;
+        const history = this.$("physical-history"); history.replaceChildren();
+        for (const outcome of this.physicalCollector.history) {
+          const item = document.createElement("li"); item.textContent = outcome.label; item.classList.toggle("reroll", !outcome.accepted); history.append(item);
+        }
+      }
+      document.querySelectorAll("[data-coin],[data-die]").forEach(button => { button.disabled = bits >= 255; });
       this.$("reactor-core").classList.toggle("ready", stats.complete);
-      this.$("core-text").innerHTML = stats.complete ? "ENTROPY<br>READY" : "Gathering<br>gameplay chaos";
+      this.$("core-text").innerHTML = stats.complete ? "COLLECTION<br>READY" : "Gathering<br>gameplay chaos";
       const generate = this.$("generate-button");
       generate.disabled = !stats.complete;
       generate.textContent = stats.complete ? `Generate ${this.wordCount}-word seed` : "Keep driving…";
+      this.$("pipeline-flow").querySelector('[data-pipeline="system"]').classList.add("active");
+      this.$("pipeline-flow").querySelector('[data-pipeline="game"]').classList.toggle("active", stats.count > 0);
+      this.$("pipeline-flow").querySelector('[data-pipeline="physical"]').classList.toggle("active", physicalOn && bits > 0);
+      this.$("pipeline-flow").querySelector('[data-pipeline="components"]').classList.toggle("active", stats.complete);
+      if (stats.count >= 45) this.showLesson("driving", "Why your driving is recorded", "Key transitions, fine-grained timing, movement, velocity, shots, and encounters become a binary transcript. It is supplemental input—not a replacement for WebCrypto.");
+      if (percentage >= 25) this.showLesson("hashing", "25% · hashing", "SHA-256 turns each length-framed source transcript into a fixed-size component. Separate domain labels make the system, gameplay, and physical roles unambiguous.");
+      if (percentage >= 50) this.showLesson("independence", "50% · source independence", "Independent sources reduce reliance on any one source. Gameplay remains supplemental because human behavior is structured and its unpredictability is not guaranteed.");
+      if (percentage >= 75) this.showLesson("measurement", "75% · count is not entropy", "Events and elapsed time satisfy a collection threshold. Human actions have no known fixed entropy value, so 1,000 events never means 1,000 entropy bits.");
+      if (stats.complete && !this.sessionCompleteAnnounced) {
+        this.sessionCompleteAnnounced = true;
+        this.showLesson("complete", "Collection complete", "The threshold is complete. You may keep playing for score and variety, or review the non-secret session summary before the one-time reveal.");
+      }
     }
 
     openConfirmation() {
       if (!this.gameCollector.checkReady() || this.generating) return;
+      const collection = this.gameCollector.stats(), game = this.game ? this.game.stats() : null;
+      this.$("summary-events").textContent = `${collection.count.toLocaleString()} events · ${(collection.elapsed / 1000).toFixed(1)} seconds`;
+      this.$("summary-driving").textContent = game ? `${Math.round(collection.distance).toLocaleString()} units · ${game.objectives} objectives · score ${game.score}` : `${Math.round(collection.distance).toLocaleString()} units`;
+      this.$("summary-physical").textContent = this.$("physical-toggle").checked ? `${this.physicalCollector.coinCount} flips · ${this.physicalCollector.acceptedDice} accepted rolls · ${this.physicalCollector.rejectedDice} rerolls` : "Not enabled";
       this.game.pause(); this.showOnly("confirm-screen");
     }
 
@@ -3217,8 +3740,10 @@ zoo`;
         physicalPayload = this.physicalCollector.exportPayload(this.$("physical-toggle").checked);
         this.mnemonicWords = await this.cryptoEngine.generate(this.wordCount, gameTranscript, physicalPayload);
         // Release all non-mnemonic session inputs immediately after consumption.
-        this.gameCollector.destroy(); this.physicalCollector.destroy();
         if (this.game) { this.game.destroy(); this.game = null; }
+        this.gameCollector.destroy(); this.physicalCollector.destroy();
+        this.$("physical-history").replaceChildren(); this.$("physical-note").textContent = "Physical session input released.";
+        this.$("accepted-count").textContent = "0"; this.$("rejected-count").textContent = "0";
         clearInterval(this.uiTimer);
         this.renderMnemonic();
         this.$("tech-system").textContent = "CONSUMED + RELEASED";
@@ -3253,11 +3778,12 @@ zoo`;
 
     destroyAndReset() {
       // SECURITY: Best-effort erasure only; browser/GC memory copies cannot be guaranteed.
+      const destroyedMnemonic = Boolean(this.mnemonicWords);
       this.$("mnemonic-grid").replaceChildren();
       if (this.mnemonicWords) this.mnemonicWords.fill("");
       this.mnemonicWords = null;
-      this.cryptoEngine.destroy(); this.gameCollector.destroy(); this.physicalCollector.destroy();
       if (this.game) { this.game.destroy(); this.game = null; }
+      this.cryptoEngine.destroy(); this.gameCollector.destroy(); this.physicalCollector.destroy();
       this.audio.close(); clearInterval(this.uiTimer);
       this.wordCount = null; this.generating = false;
       document.querySelectorAll(".choice").forEach(button => { button.classList.remove("selected"); button.setAttribute("aria-checked", "false"); });
@@ -3266,13 +3792,20 @@ zoo`;
       this.$("tech-system").textContent = "NOT INITIALIZED";
       this.$("tech-events").textContent = "0";
       this.$("tech-physical").textContent = "NOT USED";
+      this.$("physical-history").replaceChildren(); this.$("accepted-count").textContent = "0"; this.$("rejected-count").textContent = "0";
+      document.querySelectorAll("[data-coin],[data-die]").forEach(button => { button.disabled = false; });
+      this.$("lesson-card").hidden = true; this.$("pause-overlay").hidden = true;
       this.$("setup-status").textContent = "Previous session destroyed. Choose a mnemonic length to create an entirely fresh session.";
+      const setupLesson = this.$("setup-lesson");
+      setupLesson.querySelector(".eyebrow").textContent = destroyedMnemonic ? "After destruction · honest limits" : "Session reset · honest limits";
+      setupLesson.querySelector("p").textContent = "The page removed visible words and cleared its references and mutable byte arrays where practical. JavaScript cannot force the browser, garbage collector, operating system, swap, screenshots, or other software to erase every memory copy. Close the page and power down the device when your workflow requires stronger cleanup.";
+      setupLesson.hidden = false;
       this.showOnly("setup-screen");
     }
 
     failClosed(message) {
-      this.cryptoEngine.destroy(); this.gameCollector.destroy(); this.physicalCollector.destroy();
       if (this.game) { this.game.destroy(); this.game = null; }
+      this.cryptoEngine.destroy(); this.gameCollector.destroy(); this.physicalCollector.destroy();
       if (this.mnemonicWords) this.mnemonicWords.fill(""); this.mnemonicWords = null;
       clearInterval(this.uiTimer);
       this.$("mnemonic-grid").replaceChildren();
