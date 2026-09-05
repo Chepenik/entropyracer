@@ -1,0 +1,3297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; font-src 'none'; media-src data:; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; worker-src 'none'">
+  <title>Entropy Racer — Drive chaos. Generate carefully.</title>
+  <style>
+    :root {
+      --ink: #dceaff;
+      --muted: #7990aa;
+      --void: #03060c;
+      --panel: rgba(8, 15, 28, .86);
+      --line: rgba(80, 229, 255, .18);
+      --cyan: #4ce9f5;
+      --blue: #3994ff;
+      --purple: #a970ff;
+      --orange: #f7931a;
+      --green: #65f7a1;
+      --danger: #ff5578;
+      --display: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(66, 43, 132, .2), transparent 25rem),
+        radial-gradient(circle at 88% 4%, rgba(27, 146, 169, .14), transparent 28rem),
+        linear-gradient(180deg, #040812, var(--void) 45rem);
+      font-family: var(--display);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .3;
+      background-image:
+        linear-gradient(rgba(66, 215, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(66, 215, 255, .025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, black, transparent 80%);
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: var(--cyan); }
+    [hidden] { display: none !important; }
+
+    .shell { width: min(1380px, calc(100% - 40px)); margin: 0 auto; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      min-height: 78px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: #101010;
+      background: var(--orange);
+      border-radius: 50%;
+      font: 900 25px/1 Georgia, serif;
+      box-shadow: 0 0 28px rgba(247, 147, 26, .35);
+    }
+    .brand-name {
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .eyebrow {
+      color: var(--cyan);
+      font: 700 11px/1.3 var(--mono);
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+    .status-cluster { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      background: rgba(3, 7, 15, .7);
+      color: var(--muted);
+      font: 700 10px/1 var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 9px currentColor; }
+    .chip.good { color: var(--green); }
+    .chip.warn { color: var(--orange); }
+    .chip.bad { color: var(--danger); }
+
+    .mobile-warning {
+      margin: 16px auto 0;
+      padding: 14px 18px;
+      border: 1px solid rgba(247, 147, 26, .45);
+      background: rgba(247, 147, 26, .08);
+      color: #ffd5a1;
+      font: 700 13px/1.5 var(--mono);
+    }
+
+    .hero { padding: 78px 0 40px; text-align: center; }
+    .hero h1 {
+      margin: 10px auto 16px;
+      max-width: 980px;
+      font-size: clamp(54px, 9vw, 118px);
+      line-height: .83;
+      letter-spacing: -.065em;
+      text-transform: uppercase;
+      text-shadow: 0 0 38px rgba(76, 233, 245, .13);
+    }
+    .hero h1 span { color: var(--orange); }
+    .hero-copy { max-width: 760px; margin: 0 auto; color: #9bb0c8; font-size: clamp(17px, 2vw, 21px); }
+    .offline-callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      max-width: 810px;
+      margin: 34px auto 0;
+      padding: 16px 18px;
+      text-align: left;
+      border-left: 3px solid var(--orange);
+      background: rgba(247, 147, 26, .07);
+      color: #c9d4df;
+      font-size: 14px;
+    }
+    .offline-callout strong { color: white; }
+
+    .screen { margin: 24px auto 80px; }
+    .setup-panel, .reveal-panel {
+      max-width: 1020px;
+      margin: 0 auto;
+      padding: clamp(24px, 5vw, 58px);
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(13, 24, 43, .94), rgba(5, 9, 18, .96));
+      box-shadow: 0 28px 90px rgba(0, 0, 0, .34), inset 0 1px rgba(255,255,255,.03);
+      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+    }
+    .section-heading { margin: 6px 0 9px; font-size: clamp(28px, 4vw, 47px); line-height: 1; letter-spacing: -.03em; text-transform: uppercase; }
+    .section-lede { color: #8fa4bb; max-width: 700px; margin: 0 auto 28px; }
+    .center { text-align: center; }
+
+    .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0 22px; }
+    .choice {
+      position: relative;
+      min-height: 178px;
+      padding: 26px;
+      text-align: left;
+      border: 1px solid rgba(101, 131, 164, .28);
+      background: rgba(2, 8, 18, .7);
+      cursor: pointer;
+      transition: border-color .2s, transform .2s, background .2s;
+    }
+    .choice:hover { transform: translateY(-2px); border-color: rgba(76, 233, 245, .62); }
+    .choice.selected { border-color: var(--orange); background: linear-gradient(135deg, rgba(247,147,26,.12), rgba(4,15,25,.8)); box-shadow: inset 0 0 0 1px rgba(247,147,26,.2); }
+    .choice .number { display: block; color: white; font-size: 43px; font-weight: 900; line-height: 1; }
+    .choice .label { color: var(--orange); font: 800 12px/1 var(--mono); letter-spacing: .14em; }
+    .choice p { margin: 18px 0 0; color: #8298b0; font-size: 14px; }
+    .choice .radio { position: absolute; top: 24px; right: 24px; width: 19px; height: 19px; border: 1px solid #60758e; border-radius: 50%; }
+    .choice.selected .radio { border: 5px solid var(--orange); }
+
+    .primary, .secondary, .danger-button, .icon-button {
+      border: 0;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: .1em;
+      transition: transform .15s, opacity .15s, box-shadow .15s;
+    }
+    .primary { padding: 17px 25px; background: var(--orange); color: #120b03; box-shadow: 0 9px 32px rgba(247,147,26,.2); }
+    .primary:hover:not(:disabled), .secondary:hover:not(:disabled), .danger-button:hover:not(:disabled) { transform: translateY(-2px); }
+    .primary:disabled, .secondary:disabled { opacity: .35; cursor: not-allowed; }
+    .secondary { padding: 13px 18px; border: 1px solid rgba(76,233,245,.34); background: rgba(6,22,35,.8); color: var(--cyan); }
+    .danger-button { padding: 15px 22px; border: 1px solid var(--danger); background: rgba(255,85,120,.07); color: #ff8da5; }
+    .button-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; }
+    .microcopy { margin: 14px 0 0; color: #60758e; font: 11px/1.5 var(--mono); }
+
+    .game-shell { border: 1px solid var(--line); background: rgba(2, 6, 13, .94); box-shadow: 0 30px 100px rgba(0,0,0,.45); }
+    .game-topline { display: flex; align-items: center; justify-content: space-between; gap: 15px; min-height: 50px; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+    .session-label { color: #869bb1; font: 700 11px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .game-actions { display: flex; gap: 7px; }
+    .icon-button { padding: 8px 11px; border: 1px solid rgba(130,155,181,.25); background: #08111f; color: #9db1c6; font: 700 10px/1 var(--mono); }
+    .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; min-height: 650px; }
+    .canvas-wrap { position: relative; min-height: 650px; overflow: hidden; background: #02050a; }
+    #game-canvas { display: block; width: 100%; height: 100%; min-height: 650px; outline: none; }
+    .controls-tip { position: absolute; left: 16px; bottom: 15px; padding: 9px 12px; background: rgba(2,5,10,.72); color: #9cb1c5; font: 700 10px/1.4 var(--mono); letter-spacing: .07em; text-transform: uppercase; pointer-events: none; }
+    kbd { display: inline-block; min-width: 22px; margin: 0 2px; padding: 3px 5px; border: 1px solid #567086; border-bottom-width: 2px; background: #101b28; color: white; text-align: center; font: 700 10px/1 var(--mono); }
+
+    .reactor-panel { position: relative; padding: 22px; border-left: 1px solid var(--line); overflow: hidden; }
+    .reactor-panel::before { content: ""; position: absolute; width: 220px; height: 220px; right: -80px; top: 260px; border: 1px solid rgba(76,233,245,.12); border-radius: 50%; box-shadow: 0 0 55px rgba(76,233,245,.06); }
+    .reactor-title { margin: 5px 0 22px; font-size: 23px; line-height: 1; text-transform: uppercase; }
+    .source { position: relative; margin: 0 0 12px; padding: 14px; border: 1px solid rgba(88,121,151,.2); background: rgba(6,14,25,.76); }
+    .source::after { content: ""; position: absolute; right: -14px; top: 50%; width: 13px; border-top: 1px dashed rgba(76,233,245,.3); }
+    .source-label { display: flex; justify-content: space-between; gap: 10px; color: #8ba1b8; font: 700 10px/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .source-value { margin-top: 8px; color: white; font: 800 14px/1.35 var(--mono); }
+    .source-value.ready { color: var(--green); }
+    .meter { height: 4px; margin-top: 10px; overflow: hidden; background: #101b28; }
+    .meter span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--blue), var(--cyan)); box-shadow: 0 0 10px var(--cyan); transition: width .25s; }
+    .reactor-core { display: grid; place-items: center; width: 156px; height: 156px; margin: 21px auto; border: 1px solid rgba(76,233,245,.25); border-radius: 50%; background: radial-gradient(circle, rgba(76,233,245,.17), rgba(57,148,255,.04) 45%, transparent 67%); box-shadow: inset 0 0 30px rgba(76,233,245,.07), 0 0 35px rgba(76,233,245,.06); animation: breathe 3s ease-in-out infinite; }
+    .reactor-core.ready { border-color: var(--orange); background: radial-gradient(circle, rgba(247,147,26,.26), rgba(169,112,255,.08) 46%, transparent 68%); box-shadow: 0 0 40px rgba(247,147,26,.2), inset 0 0 28px rgba(247,147,26,.12); }
+    .core-text { text-align: center; color: var(--cyan); font: 900 12px/1.45 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+    .reactor-core.ready .core-text { color: var(--orange); }
+    @keyframes breathe { 50% { transform: scale(1.035); filter: brightness(1.15); } }
+
+    .physical-panel { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .toggle-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .switch { position: relative; width: 40px; height: 22px; flex: 0 0 auto; }
+    .switch input { position: absolute; opacity: 0; }
+    .switch span { position: absolute; inset: 0; border: 1px solid #42576e; border-radius: 20px; background: #101a26; cursor: pointer; }
+    .switch span::after { content: ""; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; border-radius: 50%; background: #71849a; transition: transform .2s, background .2s; }
+    .switch input:checked + span::after { transform: translateX(18px); background: var(--orange); }
+    .physical-controls { margin-top: 13px; }
+    .physical-controls p { margin: 0 0 10px; color: #73889e; font-size: 12px; }
+    .tiny-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+    .tiny-buttons button { min-width: 36px; padding: 7px 8px; border: 1px solid rgba(76,233,245,.25); background: #0b1624; color: #b7c8d9; cursor: pointer; font: 700 10px/1 var(--mono); }
+    .physical-note { min-height: 31px; color: var(--orange) !important; font: 10px/1.45 var(--mono); }
+    .generate-wrap { margin-top: 18px; }
+    .generate-wrap .primary { width: 100%; font-size: 12px; }
+
+    .serious { background: #05070a; }
+    .reveal-panel { max-width: 940px; border-color: rgba(255,85,120,.35); background: #080b10; clip-path: none; }
+    .sensitive { color: var(--danger); }
+    .warning-list { max-width: 680px; margin: 26px auto; padding: 19px 19px 19px 42px; text-align: left; border: 1px solid rgba(255,85,120,.25); background: rgba(255,85,120,.04); color: #cad3dd; }
+    .warning-list li { margin: 7px 0; }
+    .mnemonic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin: 28px 0; }
+    .word { display: flex; align-items: baseline; gap: 9px; min-width: 0; padding: 12px 13px; border: 1px solid #263342; background: #0b1118; }
+    .word-index { flex: 0 0 20px; color: #5d7186; font: 10px/1 var(--mono); }
+    .word-value { overflow: hidden; color: white; font: 800 clamp(13px, 1.5vw, 17px)/1.2 var(--mono); text-overflow: ellipsis; }
+    .custody-warning { margin: 23px 0; color: #ffb5c4; font: 800 12px/1.7 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+
+    .learn { padding: 40px 0 100px; border-top: 1px solid var(--line); }
+    .learn-head { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: end; margin-bottom: 28px; }
+    .learn-head h2 { margin: 7px 0 0; font-size: clamp(38px, 5vw, 70px); line-height: .92; text-transform: uppercase; }
+    .learn-head p { margin: 0; color: #8297ad; }
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    details { border: 1px solid rgba(91,123,153,.2); background: rgba(7,13,23,.74); }
+    summary { padding: 17px 19px; cursor: pointer; color: #d7e5f2; font-weight: 800; letter-spacing: .03em; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; float: right; color: var(--cyan); font: 18px/1 var(--mono); }
+    details[open] summary::after { content: "−"; }
+    .detail-body { padding: 0 19px 18px; color: #879cb2; font-size: 14px; }
+    .detail-body p:first-child { margin-top: 0; }
+    .detail-body strong { color: #cad7e5; }
+    .workflow { padding-left: 21px; }
+    .workflow li { margin: 5px 0; }
+    .transparency { margin-top: 22px; padding: 24px; border: 1px solid rgba(76,233,245,.22); background: #050b13; }
+    .transparency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-top: 18px; }
+    .tech-item { padding: 12px; border-left: 2px solid #253d54; background: rgba(13,23,36,.7); }
+    .tech-item span { display: block; color: #647a91; font: 9px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .tech-item strong { display: block; margin-top: 5px; color: var(--green); font: 700 11px/1.4 var(--mono); }
+    .footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px 0 45px; border-top: 1px solid var(--line); color: #61768c; font-size: 12px; }
+
+    .fatal { max-width: 920px; margin: 22px auto; padding: 20px; border: 1px solid var(--danger); background: rgba(255,85,120,.08); color: #ffc1ce; font: 700 13px/1.6 var(--mono); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 1000px) {
+      .game-layout { grid-template-columns: 1fr; }
+      .reactor-panel { border-left: 0; border-top: 1px solid var(--line); }
+      .canvas-wrap, #game-canvas { min-height: 560px; }
+      .source::after { display: none; }
+    }
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 24px, 1380px); }
+      .topbar { align-items: flex-start; padding: 16px 0; }
+      .status-cluster { max-width: 180px; }
+      .hero { padding-top: 52px; }
+      .choice-grid, .learn-head, .details-grid { grid-template-columns: 1fr; }
+      .mnemonic-grid { grid-template-columns: repeat(2, 1fr); }
+      .transparency-grid { grid-template-columns: 1fr 1fr; }
+      .footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">₿</div>
+      <div>
+        <div class="brand-name">Entropy Racer</div>
+        <div class="eyebrow">Cryptographic arcade</div>
+      </div>
+    </div>
+    <div class="status-cluster" aria-label="Environment status">
+      <span class="chip" id="context-chip">Checking context</span>
+      <span class="chip" id="crypto-chip">Running self-tests</span>
+    </div>
+  </header>
+
+  <div class="shell mobile-warning" id="mobile-warning" hidden>
+    Entropy Racer is designed for desktop and laptop computers with a physical keyboard. Mobile use is not recommended or supported.
+  </div>
+  <div class="shell fatal" id="fatal-error" role="alert" hidden>
+    CRYPTOGRAPHIC SELF-TEST FAILED. WALLET GENERATION DISABLED.
+  </div>
+
+  <main>
+    <section class="shell hero" id="hero">
+      <div class="eyebrow">Drive chaos / inspect every byte / trust carefully</div>
+      <h1>Entropy<br><span>Racer</span></h1>
+      <p class="hero-copy">Pilot a machine through cryptographic space. Your movement joins fresh system randomness—and optional physical randomness—in a transparent BIP39 generation experiment.</p>
+      <div class="offline-callout">
+        <span aria-hidden="true">◈</span>
+        <div><strong>Best-security workflow:</strong> inspect this open-source file, save it locally, disconnect the computer from networking, then open the file directly. Local file mode reduces some attack surface; it does not make a compromised machine safe.</div>
+      </div>
+    </section>
+
+    <section class="shell screen" id="setup-screen">
+      <div class="setup-panel center">
+        <div class="eyebrow">01 / Configure a fresh run</div>
+        <h2 class="section-heading">Choose one destination</h2>
+        <p class="section-lede">One session creates one mnemonic. Changing length requires destroying the session and starting again with fresh system randomness.</p>
+        <div class="choice-grid" role="radiogroup" aria-label="Mnemonic length">
+          <button class="choice" id="choice-12" role="radio" aria-checked="false" data-words="12">
+            <span class="radio" aria-hidden="true"></span>
+            <span class="number">12</span>
+            <span class="label">word mnemonic</span>
+            <p>128 bits of BIP39 entropy plus a 4-bit checksum. Common for many wallet workflows.</p>
+          </button>
+          <button class="choice" id="choice-24" role="radio" aria-checked="false" data-words="24">
+            <span class="radio" aria-hidden="true"></span>
+            <span class="number">24</span>
+            <span class="label">word mnemonic</span>
+            <p>256 bits of BIP39 entropy plus an 8-bit checksum. More words and a larger entropy input.</p>
+          </button>
+        </div>
+        <div class="button-row">
+          <button class="primary" id="start-button" disabled>Start fresh entropy session</button>
+        </div>
+        <p class="microcopy" id="setup-status">Cryptographic self-tests are running. Generation remains locked until they pass.</p>
+      </div>
+    </section>
+
+    <section class="shell screen" id="game-screen" hidden>
+      <div class="game-shell">
+        <div class="game-topline">
+          <div class="session-label"><span id="mode-label">12-word mode</span> · session memory only · no death / no game over</div>
+          <div class="game-actions">
+            <button class="icon-button" id="mute-button" aria-pressed="false">Sound on</button>
+            <button class="icon-button" id="reset-button">Abort + reset</button>
+          </div>
+        </div>
+        <div class="game-layout">
+          <div class="canvas-wrap">
+            <canvas id="game-canvas" tabindex="0" aria-label="Entropy Racer game. Use arrow keys to drive and Space to fire."></canvas>
+            <div class="controls-tip"><kbd>↑</kbd><kbd>↓</kbd> thrust · <kbd>←</kbd><kbd>→</kbd> steer · <kbd>space</kbd> laser</div>
+          </div>
+          <aside class="reactor-panel" aria-label="Entropy reactor status">
+            <div class="eyebrow">Live entropy reactor</div>
+            <h2 class="reactor-title">Three independent inputs</h2>
+            <div class="source">
+              <div class="source-label"><span>System entropy</span><span>Source 01</span></div>
+              <div class="source-value ready">CSPRNG READY</div>
+              <div class="meter"><span style="width:100%"></span></div>
+            </div>
+            <div class="source">
+              <div class="source-label"><span>Game chaos</span><span>Source 02</span></div>
+              <div class="source-value" id="game-value">0 EVENTS · COLLECTING</div>
+              <div class="meter"><span id="game-meter"></span></div>
+            </div>
+            <div class="source">
+              <div class="source-label"><span>Physical entropy</span><span>Source 03</span></div>
+              <div class="source-value" id="physical-value">OPTIONAL · 0 BITS</div>
+              <div class="meter"><span id="physical-meter"></span></div>
+            </div>
+            <div class="reactor-core" id="reactor-core">
+              <div class="core-text" id="core-text">Gathering<br>gameplay chaos</div>
+            </div>
+            <div class="source-label"><span>Collection threshold</span><span id="progress-label">0%</span></div>
+            <p class="microcopy">Progress measures a collection threshold—not a proven number of entropy bits from gameplay.</p>
+
+            <div class="physical-panel">
+              <div class="toggle-line">
+                <div><div class="eyebrow">Paranoid mode</div><div class="microcopy">Add physical randomness</div></div>
+                <label class="switch"><span class="sr-only">Enable physical entropy</span><input id="physical-toggle" type="checkbox"><span aria-hidden="true"></span></label>
+              </div>
+              <div class="physical-controls" id="physical-controls" hidden>
+                <p>Coin: Heads = 0, Tails = 1</p>
+                <div class="tiny-buttons">
+                  <button data-coin="0">Heads</button><button data-coin="1">Tails</button>
+                </div>
+                <p>Fair die: 1–4 yield two bits; 5–6 are rejected.</p>
+                <div class="tiny-buttons">
+                  <button data-die="1">1</button><button data-die="2">2</button><button data-die="3">3</button><button data-die="4">4</button><button data-die="5">5</button><button data-die="6">6</button>
+                </div>
+                <p class="physical-note" id="physical-note" aria-live="polite">Enter outcomes exactly as they occur. Never cherry-pick.</p>
+              </div>
+            </div>
+            <div class="generate-wrap">
+              <button class="primary" id="generate-button" disabled>Keep driving…</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell screen serious" id="confirm-screen" hidden>
+      <div class="reveal-panel center">
+        <div class="eyebrow sensitive">Sensitive transition</div>
+        <h2 class="section-heading">Leave the arcade behind</h2>
+        <p class="section-lede">Your seed phrase controls the Bitcoin wallet derived from it. Anyone who obtains these words can control those funds.</p>
+        <ul class="warning-list">
+          <li>Close screen-sharing, recording, remote-access, and cloud-note software.</li>
+          <li>Prefer writing the words on a durable physical backup.</li>
+          <li>A screenshot may be copied to cloud storage automatically.</li>
+          <li>Generation consumes this session; it cannot produce a second phrase.</li>
+        </ul>
+        <div class="button-row">
+          <button class="secondary" id="return-game-button">Return to driving</button>
+          <button class="primary" id="reveal-button">Generate + reveal once</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell screen serious" id="reveal-screen" hidden>
+      <div class="reveal-panel center">
+        <div class="eyebrow sensitive">Sensitive information · never share</div>
+        <h2 class="section-heading">Record these words offline</h2>
+        <p class="section-lede">Write them down in numbered order. This page will not copy, save, transmit, or regenerate them.</p>
+        <div class="mnemonic-grid" id="mnemonic-grid" aria-label="Generated BIP39 mnemonic"></div>
+        <div class="custody-warning">Do not share these words · do not email them · do not put them in cloud notes · verify your backup before funding</div>
+        <button class="danger-button" id="destroy-button">Destroy seed + reset session</button>
+        <p class="microcopy">Destroying removes references where practical, but JavaScript and browser memory management cannot guarantee perfect erasure from RAM.</p>
+      </div>
+    </section>
+
+    <section class="learn" id="learn">
+      <div class="shell">
+        <div class="learn-head">
+          <div><div class="eyebrow">Read before relying</div><h2>Know what the machine does.</h2></div>
+          <p>Entropy Racer is intentionally inspectable. The game is the visible layer; the security model, limitations, and exact cryptographic stages matter more.</p>
+        </div>
+        <div class="details-grid">
+          <details><summary>What is a Bitcoin seed phrase?</summary><div class="detail-body"><p>A BIP39 mnemonic is a human-readable representation of entropy plus a checksum. Wallet software uses it to derive keys. Possession of the words can allow control of the wallet, so treat them like the funds themselves.</p></div></details>
+          <details><summary>What is entropy?</summary><div class="detail-body"><p>Entropy is unpredictable input. Strong wallet generation needs input an attacker cannot feasibly guess. Humans are generally poor randomness generators, which is why the system cryptographic random source is foundational here.</p></div></details>
+          <details><summary>Why collect driving movement?</summary><div class="detail-body"><p>Key transitions, high-resolution timing, frame jitter, position, velocity, steering, firing, and collisions form a deterministic binary transcript that is hashed as a supplemental source. <strong>Entropy Racer does not claim each action contributes a fixed number of entropy bits.</strong> The percentage shown is only a collection threshold.</p></div></details>
+          <details><summary>What is WebCrypto?</summary><div class="detail-body"><p><code>crypto.getRandomValues()</code> is the browser's cryptographically secure pseudorandom generator interface and normally draws from operating-system randomness. It is not described here as guaranteed “true randomness.” If WebCrypto is unavailable or self-tests fail, generation is disabled with no fallback to <code>Math.random()</code>.</p></div></details>
+          <details><summary>What is physical entropy?</summary><div class="detail-body"><p>Coin flips and fair dice can contribute a conceptually independent source. Heads and tails map to one bit. Die results 1–4 map to two bits; 5 and 6 are rejected to avoid modulo bias. Physical input is optional and is only as trustworthy as the object and the recording process.</p></div></details>
+          <details><summary>What is BIP39?</summary><div class="detail-body"><p>BIP39 standardizes mnemonics drawn from a 2,048-word list with a checksum. Twelve words encode 128 entropy bits plus 4 checksum bits; twenty-four encode 256 plus 8. Import compatibility varies with passphrases, derivation paths, script types, and wallet behavior. Confirm compatibility yourself before relying on an import.</p></div></details>
+          <details><summary>Why run this offline?</summary><div class="detail-body"><p>Remote dependencies, injected scripts, browser extensions, malware, clipboard monitoring, and screen capture can expose secrets. One inspectable local file with no network requests reduces some attack surfaces, but cannot make compromised hardware, an operating system, or a browser safe.</p></div></details>
+          <details><summary>Can I import the words elsewhere?</summary><div class="detail-body"><p>Many Bitcoin wallets support BIP39 import, but behavior varies. Entering words into software or an internet-connected device can expose them. Test compatibility with disposable test mnemonics and consult the target wallet's own documentation.</p></div></details>
+          <details><summary>Exact entropy construction</summary><div class="detail-body"><p>Each part is framed with explicit byte lengths. The system component is SHA-256 over the domain <code>EntropyRacer-v1-system</code> and a fresh 256-bit WebCrypto value. The game and optional physical transcripts are independently hashed under their own domains. Those three 32-byte digests are hashed under <code>EntropyRacer-v1-final</code>, then a length-specific <code>EntropyRacer-v1-bip39-12</code> or <code>-24</code> derivation produces the required entropy bytes. The BIP39 checksum is computed and validated before display.</p></div></details>
+          <details><summary>Threat model: what it can help with</summary><div class="detail-body"><p>The design reduces dependence on one randomness source, remote libraries, server-side generation, network APIs, and silent server storage. It uses fresh session randomness, explicit source separation, local test vectors, and a single-use generation state.</p></div></details>
+          <details><summary>Threat model: what it cannot stop</summary><div class="detail-body"><p>It cannot protect against a compromised OS, malicious browser or extension, keylogger, screen recorder, compromised hardware, hostile modified copy, weak physical source, exposed words, bad backups, coercion, or unknown future cryptographic weaknesses.</p></div></details>
+          <details><summary>Why open source?</summary><div class="detail-body"><p>Cryptographic software should be inspectable. Review the complete source and security policy at <a href="https://github.com/Chepenik/entropyracer" target="_blank" rel="noreferrer">github.com/Chepenik/entropyracer</a>. A published file is not automatically trustworthy: verify it against the repository or a release hash when one is available.</p></div></details>
+          <details><summary>Recommended offline workflow</summary><div class="detail-body"><ol class="workflow"><li>Visit and review the GitHub repository.</li><li>Obtain the published HTML and verify its release hash if available.</li><li>Save the file locally.</li><li>Disconnect networking.</li><li>Open the local file.</li><li>Generate and physically record the mnemonic.</li><li>Verify the backup, then destroy the on-screen seed.</li><li>Reconnect only after the sensitive session is complete.</li></ol><p>Established hardware-wallet workflows are generally preferable for meaningful holdings.</p></div></details>
+          <details><summary>Disclaimer</summary><div class="detail-body"><p>Entropy Racer is an experimental educational hobby project, provided as-is. It is not financial, legal, cybersecurity, or custody advice. You are responsible for reviewing and validating it. No software can guarantee protection from compromised devices, malware, disclosure, poor backups, user error, or future vulnerabilities. The author does not promise fitness for securing significant funds.</p></div></details>
+        </div>
+
+        <section class="transparency" aria-labelledby="transparency-title">
+          <div class="eyebrow">Advanced technical transparency</div>
+          <h2 class="reactor-title" id="transparency-title">No secret values shown</h2>
+          <div class="transparency-grid">
+            <div class="tech-item"><span>WebCrypto CSPRNG</span><strong id="tech-csprng">CHECKING</strong></div>
+            <div class="tech-item"><span>SHA-256</span><strong id="tech-sha">CHECKING</strong></div>
+            <div class="tech-item"><span>BIP39 word list</span><strong id="tech-words">CHECKING</strong></div>
+            <div class="tech-item"><span>Current mode</span><strong id="tech-mode">NOT SELECTED</strong></div>
+            <div class="tech-item"><span>System randomness</span><strong id="tech-system">NOT INITIALIZED</strong></div>
+            <div class="tech-item"><span>Game events</span><strong id="tech-events">0</strong></div>
+            <div class="tech-item"><span>Physical randomness</span><strong id="tech-physical">NOT USED</strong></div>
+            <div class="tech-item"><span>Network requests required</span><strong>NONE</strong></div>
+            <div class="tech-item"><span>Mnemonic persistence</span><strong>NONE</strong></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <span>Entropy Racer · experimental open-source education</span>
+    <span>MIT License · <a href="https://github.com/Chepenik/entropyracer/blob/main/SECURITY.md" target="_blank" rel="noreferrer">Report security issues privately</a></span>
+  </footer>
+
+  <script>
+  "use strict";
+
+  /* ========================================================================
+     BIP39 WORD LIST
+     Official English list from bitcoin/bips, embedded for fully offline use.
+     Source: https://github.com/bitcoin/bips/tree/master/bip-0039
+     Source file SHA-256: 2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda
+     SECURITY: Startup tests require exactly 2,048 correctly ordered entries.
+     ======================================================================== */
+  const BIP39_WORDS_RAW = `abandon
+ability
+able
+about
+above
+absent
+absorb
+abstract
+absurd
+abuse
+access
+accident
+account
+accuse
+achieve
+acid
+acoustic
+acquire
+across
+act
+action
+actor
+actress
+actual
+adapt
+add
+addict
+address
+adjust
+admit
+adult
+advance
+advice
+aerobic
+affair
+afford
+afraid
+again
+age
+agent
+agree
+ahead
+aim
+air
+airport
+aisle
+alarm
+album
+alcohol
+alert
+alien
+all
+alley
+allow
+almost
+alone
+alpha
+already
+also
+alter
+always
+amateur
+amazing
+among
+amount
+amused
+analyst
+anchor
+ancient
+anger
+angle
+angry
+animal
+ankle
+announce
+annual
+another
+answer
+antenna
+antique
+anxiety
+any
+apart
+apology
+appear
+apple
+approve
+april
+arch
+arctic
+area
+arena
+argue
+arm
+armed
+armor
+army
+around
+arrange
+arrest
+arrive
+arrow
+art
+artefact
+artist
+artwork
+ask
+aspect
+assault
+asset
+assist
+assume
+asthma
+athlete
+atom
+attack
+attend
+attitude
+attract
+auction
+audit
+august
+aunt
+author
+auto
+autumn
+average
+avocado
+avoid
+awake
+aware
+away
+awesome
+awful
+awkward
+axis
+baby
+bachelor
+bacon
+badge
+bag
+balance
+balcony
+ball
+bamboo
+banana
+banner
+bar
+barely
+bargain
+barrel
+base
+basic
+basket
+battle
+beach
+bean
+beauty
+because
+become
+beef
+before
+begin
+behave
+behind
+believe
+below
+belt
+bench
+benefit
+best
+betray
+better
+between
+beyond
+bicycle
+bid
+bike
+bind
+biology
+bird
+birth
+bitter
+black
+blade
+blame
+blanket
+blast
+bleak
+bless
+blind
+blood
+blossom
+blouse
+blue
+blur
+blush
+board
+boat
+body
+boil
+bomb
+bone
+bonus
+book
+boost
+border
+boring
+borrow
+boss
+bottom
+bounce
+box
+boy
+bracket
+brain
+brand
+brass
+brave
+bread
+breeze
+brick
+bridge
+brief
+bright
+bring
+brisk
+broccoli
+broken
+bronze
+broom
+brother
+brown
+brush
+bubble
+buddy
+budget
+buffalo
+build
+bulb
+bulk
+bullet
+bundle
+bunker
+burden
+burger
+burst
+bus
+business
+busy
+butter
+buyer
+buzz
+cabbage
+cabin
+cable
+cactus
+cage
+cake
+call
+calm
+camera
+camp
+can
+canal
+cancel
+candy
+cannon
+canoe
+canvas
+canyon
+capable
+capital
+captain
+car
+carbon
+card
+cargo
+carpet
+carry
+cart
+case
+cash
+casino
+castle
+casual
+cat
+catalog
+catch
+category
+cattle
+caught
+cause
+caution
+cave
+ceiling
+celery
+cement
+census
+century
+cereal
+certain
+chair
+chalk
+champion
+change
+chaos
+chapter
+charge
+chase
+chat
+cheap
+check
+cheese
+chef
+cherry
+chest
+chicken
+chief
+child
+chimney
+choice
+choose
+chronic
+chuckle
+chunk
+churn
+cigar
+cinnamon
+circle
+citizen
+city
+civil
+claim
+clap
+clarify
+claw
+clay
+clean
+clerk
+clever
+click
+client
+cliff
+climb
+clinic
+clip
+clock
+clog
+close
+cloth
+cloud
+clown
+club
+clump
+cluster
+clutch
+coach
+coast
+coconut
+code
+coffee
+coil
+coin
+collect
+color
+column
+combine
+come
+comfort
+comic
+common
+company
+concert
+conduct
+confirm
+congress
+connect
+consider
+control
+convince
+cook
+cool
+copper
+copy
+coral
+core
+corn
+correct
+cost
+cotton
+couch
+country
+couple
+course
+cousin
+cover
+coyote
+crack
+cradle
+craft
+cram
+crane
+crash
+crater
+crawl
+crazy
+cream
+credit
+creek
+crew
+cricket
+crime
+crisp
+critic
+crop
+cross
+crouch
+crowd
+crucial
+cruel
+cruise
+crumble
+crunch
+crush
+cry
+crystal
+cube
+culture
+cup
+cupboard
+curious
+current
+curtain
+curve
+cushion
+custom
+cute
+cycle
+dad
+damage
+damp
+dance
+danger
+daring
+dash
+daughter
+dawn
+day
+deal
+debate
+debris
+decade
+december
+decide
+decline
+decorate
+decrease
+deer
+defense
+define
+defy
+degree
+delay
+deliver
+demand
+demise
+denial
+dentist
+deny
+depart
+depend
+deposit
+depth
+deputy
+derive
+describe
+desert
+design
+desk
+despair
+destroy
+detail
+detect
+develop
+device
+devote
+diagram
+dial
+diamond
+diary
+dice
+diesel
+diet
+differ
+digital
+dignity
+dilemma
+dinner
+dinosaur
+direct
+dirt
+disagree
+discover
+disease
+dish
+dismiss
+disorder
+display
+distance
+divert
+divide
+divorce
+dizzy
+doctor
+document
+dog
+doll
+dolphin
+domain
+donate
+donkey
+donor
+door
+dose
+double
+dove
+draft
+dragon
+drama
+drastic
+draw
+dream
+dress
+drift
+drill
+drink
+drip
+drive
+drop
+drum
+dry
+duck
+dumb
+dune
+during
+dust
+dutch
+duty
+dwarf
+dynamic
+eager
+eagle
+early
+earn
+earth
+easily
+east
+easy
+echo
+ecology
+economy
+edge
+edit
+educate
+effort
+egg
+eight
+either
+elbow
+elder
+electric
+elegant
+element
+elephant
+elevator
+elite
+else
+embark
+embody
+embrace
+emerge
+emotion
+employ
+empower
+empty
+enable
+enact
+end
+endless
+endorse
+enemy
+energy
+enforce
+engage
+engine
+enhance
+enjoy
+enlist
+enough
+enrich
+enroll
+ensure
+enter
+entire
+entry
+envelope
+episode
+equal
+equip
+era
+erase
+erode
+erosion
+error
+erupt
+escape
+essay
+essence
+estate
+eternal
+ethics
+evidence
+evil
+evoke
+evolve
+exact
+example
+excess
+exchange
+excite
+exclude
+excuse
+execute
+exercise
+exhaust
+exhibit
+exile
+exist
+exit
+exotic
+expand
+expect
+expire
+explain
+expose
+express
+extend
+extra
+eye
+eyebrow
+fabric
+face
+faculty
+fade
+faint
+faith
+fall
+false
+fame
+family
+famous
+fan
+fancy
+fantasy
+farm
+fashion
+fat
+fatal
+father
+fatigue
+fault
+favorite
+feature
+february
+federal
+fee
+feed
+feel
+female
+fence
+festival
+fetch
+fever
+few
+fiber
+fiction
+field
+figure
+file
+film
+filter
+final
+find
+fine
+finger
+finish
+fire
+firm
+first
+fiscal
+fish
+fit
+fitness
+fix
+flag
+flame
+flash
+flat
+flavor
+flee
+flight
+flip
+float
+flock
+floor
+flower
+fluid
+flush
+fly
+foam
+focus
+fog
+foil
+fold
+follow
+food
+foot
+force
+forest
+forget
+fork
+fortune
+forum
+forward
+fossil
+foster
+found
+fox
+fragile
+frame
+frequent
+fresh
+friend
+fringe
+frog
+front
+frost
+frown
+frozen
+fruit
+fuel
+fun
+funny
+furnace
+fury
+future
+gadget
+gain
+galaxy
+gallery
+game
+gap
+garage
+garbage
+garden
+garlic
+garment
+gas
+gasp
+gate
+gather
+gauge
+gaze
+general
+genius
+genre
+gentle
+genuine
+gesture
+ghost
+giant
+gift
+giggle
+ginger
+giraffe
+girl
+give
+glad
+glance
+glare
+glass
+glide
+glimpse
+globe
+gloom
+glory
+glove
+glow
+glue
+goat
+goddess
+gold
+good
+goose
+gorilla
+gospel
+gossip
+govern
+gown
+grab
+grace
+grain
+grant
+grape
+grass
+gravity
+great
+green
+grid
+grief
+grit
+grocery
+group
+grow
+grunt
+guard
+guess
+guide
+guilt
+guitar
+gun
+gym
+habit
+hair
+half
+hammer
+hamster
+hand
+happy
+harbor
+hard
+harsh
+harvest
+hat
+have
+hawk
+hazard
+head
+health
+heart
+heavy
+hedgehog
+height
+hello
+helmet
+help
+hen
+hero
+hidden
+high
+hill
+hint
+hip
+hire
+history
+hobby
+hockey
+hold
+hole
+holiday
+hollow
+home
+honey
+hood
+hope
+horn
+horror
+horse
+hospital
+host
+hotel
+hour
+hover
+hub
+huge
+human
+humble
+humor
+hundred
+hungry
+hunt
+hurdle
+hurry
+hurt
+husband
+hybrid
+ice
+icon
+idea
+identify
+idle
+ignore
+ill
+illegal
+illness
+image
+imitate
+immense
+immune
+impact
+impose
+improve
+impulse
+inch
+include
+income
+increase
+index
+indicate
+indoor
+industry
+infant
+inflict
+inform
+inhale
+inherit
+initial
+inject
+injury
+inmate
+inner
+innocent
+input
+inquiry
+insane
+insect
+inside
+inspire
+install
+intact
+interest
+into
+invest
+invite
+involve
+iron
+island
+isolate
+issue
+item
+ivory
+jacket
+jaguar
+jar
+jazz
+jealous
+jeans
+jelly
+jewel
+job
+join
+joke
+journey
+joy
+judge
+juice
+jump
+jungle
+junior
+junk
+just
+kangaroo
+keen
+keep
+ketchup
+key
+kick
+kid
+kidney
+kind
+kingdom
+kiss
+kit
+kitchen
+kite
+kitten
+kiwi
+knee
+knife
+knock
+know
+lab
+label
+labor
+ladder
+lady
+lake
+lamp
+language
+laptop
+large
+later
+latin
+laugh
+laundry
+lava
+law
+lawn
+lawsuit
+layer
+lazy
+leader
+leaf
+learn
+leave
+lecture
+left
+leg
+legal
+legend
+leisure
+lemon
+lend
+length
+lens
+leopard
+lesson
+letter
+level
+liar
+liberty
+library
+license
+life
+lift
+light
+like
+limb
+limit
+link
+lion
+liquid
+list
+little
+live
+lizard
+load
+loan
+lobster
+local
+lock
+logic
+lonely
+long
+loop
+lottery
+loud
+lounge
+love
+loyal
+lucky
+luggage
+lumber
+lunar
+lunch
+luxury
+lyrics
+machine
+mad
+magic
+magnet
+maid
+mail
+main
+major
+make
+mammal
+man
+manage
+mandate
+mango
+mansion
+manual
+maple
+marble
+march
+margin
+marine
+market
+marriage
+mask
+mass
+master
+match
+material
+math
+matrix
+matter
+maximum
+maze
+meadow
+mean
+measure
+meat
+mechanic
+medal
+media
+melody
+melt
+member
+memory
+mention
+menu
+mercy
+merge
+merit
+merry
+mesh
+message
+metal
+method
+middle
+midnight
+milk
+million
+mimic
+mind
+minimum
+minor
+minute
+miracle
+mirror
+misery
+miss
+mistake
+mix
+mixed
+mixture
+mobile
+model
+modify
+mom
+moment
+monitor
+monkey
+monster
+month
+moon
+moral
+more
+morning
+mosquito
+mother
+motion
+motor
+mountain
+mouse
+move
+movie
+much
+muffin
+mule
+multiply
+muscle
+museum
+mushroom
+music
+must
+mutual
+myself
+mystery
+myth
+naive
+name
+napkin
+narrow
+nasty
+nation
+nature
+near
+neck
+need
+negative
+neglect
+neither
+nephew
+nerve
+nest
+net
+network
+neutral
+never
+news
+next
+nice
+night
+noble
+noise
+nominee
+noodle
+normal
+north
+nose
+notable
+note
+nothing
+notice
+novel
+now
+nuclear
+number
+nurse
+nut
+oak
+obey
+object
+oblige
+obscure
+observe
+obtain
+obvious
+occur
+ocean
+october
+odor
+off
+offer
+office
+often
+oil
+okay
+old
+olive
+olympic
+omit
+once
+one
+onion
+online
+only
+open
+opera
+opinion
+oppose
+option
+orange
+orbit
+orchard
+order
+ordinary
+organ
+orient
+original
+orphan
+ostrich
+other
+outdoor
+outer
+output
+outside
+oval
+oven
+over
+own
+owner
+oxygen
+oyster
+ozone
+pact
+paddle
+page
+pair
+palace
+palm
+panda
+panel
+panic
+panther
+paper
+parade
+parent
+park
+parrot
+party
+pass
+patch
+path
+patient
+patrol
+pattern
+pause
+pave
+payment
+peace
+peanut
+pear
+peasant
+pelican
+pen
+penalty
+pencil
+people
+pepper
+perfect
+permit
+person
+pet
+phone
+photo
+phrase
+physical
+piano
+picnic
+picture
+piece
+pig
+pigeon
+pill
+pilot
+pink
+pioneer
+pipe
+pistol
+pitch
+pizza
+place
+planet
+plastic
+plate
+play
+please
+pledge
+pluck
+plug
+plunge
+poem
+poet
+point
+polar
+pole
+police
+pond
+pony
+pool
+popular
+portion
+position
+possible
+post
+potato
+pottery
+poverty
+powder
+power
+practice
+praise
+predict
+prefer
+prepare
+present
+pretty
+prevent
+price
+pride
+primary
+print
+priority
+prison
+private
+prize
+problem
+process
+produce
+profit
+program
+project
+promote
+proof
+property
+prosper
+protect
+proud
+provide
+public
+pudding
+pull
+pulp
+pulse
+pumpkin
+punch
+pupil
+puppy
+purchase
+purity
+purpose
+purse
+push
+put
+puzzle
+pyramid
+quality
+quantum
+quarter
+question
+quick
+quit
+quiz
+quote
+rabbit
+raccoon
+race
+rack
+radar
+radio
+rail
+rain
+raise
+rally
+ramp
+ranch
+random
+range
+rapid
+rare
+rate
+rather
+raven
+raw
+razor
+ready
+real
+reason
+rebel
+rebuild
+recall
+receive
+recipe
+record
+recycle
+reduce
+reflect
+reform
+refuse
+region
+regret
+regular
+reject
+relax
+release
+relief
+rely
+remain
+remember
+remind
+remove
+render
+renew
+rent
+reopen
+repair
+repeat
+replace
+report
+require
+rescue
+resemble
+resist
+resource
+response
+result
+retire
+retreat
+return
+reunion
+reveal
+review
+reward
+rhythm
+rib
+ribbon
+rice
+rich
+ride
+ridge
+rifle
+right
+rigid
+ring
+riot
+ripple
+risk
+ritual
+rival
+river
+road
+roast
+robot
+robust
+rocket
+romance
+roof
+rookie
+room
+rose
+rotate
+rough
+round
+route
+royal
+rubber
+rude
+rug
+rule
+run
+runway
+rural
+sad
+saddle
+sadness
+safe
+sail
+salad
+salmon
+salon
+salt
+salute
+same
+sample
+sand
+satisfy
+satoshi
+sauce
+sausage
+save
+say
+scale
+scan
+scare
+scatter
+scene
+scheme
+school
+science
+scissors
+scorpion
+scout
+scrap
+screen
+script
+scrub
+sea
+search
+season
+seat
+second
+secret
+section
+security
+seed
+seek
+segment
+select
+sell
+seminar
+senior
+sense
+sentence
+series
+service
+session
+settle
+setup
+seven
+shadow
+shaft
+shallow
+share
+shed
+shell
+sheriff
+shield
+shift
+shine
+ship
+shiver
+shock
+shoe
+shoot
+shop
+short
+shoulder
+shove
+shrimp
+shrug
+shuffle
+shy
+sibling
+sick
+side
+siege
+sight
+sign
+silent
+silk
+silly
+silver
+similar
+simple
+since
+sing
+siren
+sister
+situate
+six
+size
+skate
+sketch
+ski
+skill
+skin
+skirt
+skull
+slab
+slam
+sleep
+slender
+slice
+slide
+slight
+slim
+slogan
+slot
+slow
+slush
+small
+smart
+smile
+smoke
+smooth
+snack
+snake
+snap
+sniff
+snow
+soap
+soccer
+social
+sock
+soda
+soft
+solar
+soldier
+solid
+solution
+solve
+someone
+song
+soon
+sorry
+sort
+soul
+sound
+soup
+source
+south
+space
+spare
+spatial
+spawn
+speak
+special
+speed
+spell
+spend
+sphere
+spice
+spider
+spike
+spin
+spirit
+split
+spoil
+sponsor
+spoon
+sport
+spot
+spray
+spread
+spring
+spy
+square
+squeeze
+squirrel
+stable
+stadium
+staff
+stage
+stairs
+stamp
+stand
+start
+state
+stay
+steak
+steel
+stem
+step
+stereo
+stick
+still
+sting
+stock
+stomach
+stone
+stool
+story
+stove
+strategy
+street
+strike
+strong
+struggle
+student
+stuff
+stumble
+style
+subject
+submit
+subway
+success
+such
+sudden
+suffer
+sugar
+suggest
+suit
+summer
+sun
+sunny
+sunset
+super
+supply
+supreme
+sure
+surface
+surge
+surprise
+surround
+survey
+suspect
+sustain
+swallow
+swamp
+swap
+swarm
+swear
+sweet
+swift
+swim
+swing
+switch
+sword
+symbol
+symptom
+syrup
+system
+table
+tackle
+tag
+tail
+talent
+talk
+tank
+tape
+target
+task
+taste
+tattoo
+taxi
+teach
+team
+tell
+ten
+tenant
+tennis
+tent
+term
+test
+text
+thank
+that
+theme
+then
+theory
+there
+they
+thing
+this
+thought
+three
+thrive
+throw
+thumb
+thunder
+ticket
+tide
+tiger
+tilt
+timber
+time
+tiny
+tip
+tired
+tissue
+title
+toast
+tobacco
+today
+toddler
+toe
+together
+toilet
+token
+tomato
+tomorrow
+tone
+tongue
+tonight
+tool
+tooth
+top
+topic
+topple
+torch
+tornado
+tortoise
+toss
+total
+tourist
+toward
+tower
+town
+toy
+track
+trade
+traffic
+tragic
+train
+transfer
+trap
+trash
+travel
+tray
+treat
+tree
+trend
+trial
+tribe
+trick
+trigger
+trim
+trip
+trophy
+trouble
+truck
+true
+truly
+trumpet
+trust
+truth
+try
+tube
+tuition
+tumble
+tuna
+tunnel
+turkey
+turn
+turtle
+twelve
+twenty
+twice
+twin
+twist
+two
+type
+typical
+ugly
+umbrella
+unable
+unaware
+uncle
+uncover
+under
+undo
+unfair
+unfold
+unhappy
+uniform
+unique
+unit
+universe
+unknown
+unlock
+until
+unusual
+unveil
+update
+upgrade
+uphold
+upon
+upper
+upset
+urban
+urge
+usage
+use
+used
+useful
+useless
+usual
+utility
+vacant
+vacuum
+vague
+valid
+valley
+valve
+van
+vanish
+vapor
+various
+vast
+vault
+vehicle
+velvet
+vendor
+venture
+venue
+verb
+verify
+version
+very
+vessel
+veteran
+viable
+vibrant
+vicious
+victory
+video
+view
+village
+vintage
+violin
+virtual
+virus
+visa
+visit
+visual
+vital
+vivid
+vocal
+voice
+void
+volcano
+volume
+vote
+voyage
+wage
+wagon
+wait
+walk
+wall
+walnut
+want
+warfare
+warm
+warrior
+wash
+wasp
+waste
+water
+wave
+way
+wealth
+weapon
+wear
+weasel
+weather
+web
+wedding
+weekend
+weird
+welcome
+west
+wet
+whale
+what
+wheat
+wheel
+when
+where
+whip
+whisper
+wide
+width
+wife
+wild
+will
+win
+window
+wine
+wing
+wink
+winner
+winter
+wire
+wisdom
+wise
+wish
+witness
+wolf
+woman
+wonder
+wood
+wool
+word
+work
+world
+worry
+worth
+wrap
+wreck
+wrestle
+wrist
+write
+wrong
+yard
+year
+yellow
+you
+young
+youth
+zebra
+zero
+zone
+zoo`;
+  const BIP39_WORDS = Object.freeze(BIP39_WORDS_RAW.trim().split(/\s+/));
+
+  /* ========================================================================
+     BINARY AND CRYPTOGRAPHIC HELPERS
+     SECURITY: All structured hashes use length-prefixed binary framing. This
+     avoids ambiguity from casual string concatenation.
+     ======================================================================== */
+  const UTF8 = new TextEncoder();
+
+  function concatBytes(...parts) {
+    const length = parts.reduce((total, part) => total + part.length, 0);
+    const out = new Uint8Array(length);
+    let offset = 0;
+    for (const part of parts) { out.set(part, offset); offset += part.length; }
+    return out;
+  }
+
+  function u32(value) {
+    const out = new Uint8Array(4);
+    new DataView(out.buffer).setUint32(0, value >>> 0, false);
+    return out;
+  }
+
+  function framed(domain, ...parts) {
+    const label = UTF8.encode(domain);
+    const framedParts = [u32(label.length), label];
+    for (const part of parts) framedParts.push(u32(part.length), part);
+    return concatBytes(...framedParts);
+  }
+
+  async function sha256(bytes) {
+    // SECURITY: Never replace WebCrypto with a non-cryptographic hash.
+    return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  }
+
+  async function domainHash(domain, ...parts) {
+    return sha256(framed(domain, ...parts));
+  }
+
+  function bytesToBits(bytes) {
+    let bits = "";
+    for (const byte of bytes) bits += byte.toString(2).padStart(8, "0");
+    return bits;
+  }
+
+  function bitsToBytes(bits) {
+    if (bits.length % 8 !== 0) throw new Error("Bit length must be byte-aligned");
+    const out = new Uint8Array(bits.length / 8);
+    for (let i = 0; i < out.length; i++) out[i] = parseInt(bits.slice(i * 8, i * 8 + 8), 2);
+    return out;
+  }
+
+  function constantTimeEqual(a, b) {
+    if (a.length !== b.length) return false;
+    let diff = 0;
+    for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+    return diff === 0;
+  }
+
+  /* ========================================================================
+     BIP39
+     ======================================================================== */
+  class Bip39 {
+    static async entropyToWords(entropy) {
+      if (entropy.length !== 16 && entropy.length !== 32) throw new Error("BIP39 entropy must be 128 or 256 bits");
+      const checksumLength = entropy.length * 8 / 32;
+      const digest = await sha256(entropy);
+      const bits = bytesToBits(entropy) + bytesToBits(digest).slice(0, checksumLength);
+      digest.fill(0);
+      const words = [];
+      for (let i = 0; i < bits.length; i += 11) {
+        const index = parseInt(bits.slice(i, i + 11), 2);
+        if (index < 0 || index >= BIP39_WORDS.length) throw new Error("BIP39 word index out of range");
+        words.push(BIP39_WORDS[index]);
+      }
+      return words;
+    }
+
+    static async validate(words) {
+      if (!Array.isArray(words) || (words.length !== 12 && words.length !== 24)) return false;
+      let bits = "";
+      for (const word of words) {
+        const index = BIP39_WORDS.indexOf(word);
+        if (index < 0) return false;
+        bits += index.toString(2).padStart(11, "0");
+      }
+      const entropyLength = Math.floor(bits.length * 32 / 33);
+      const checksumLength = bits.length - entropyLength;
+      const entropy = bitsToBytes(bits.slice(0, entropyLength));
+      const expected = bits.slice(entropyLength);
+      const digest = await sha256(entropy);
+      const actual = bytesToBits(digest).slice(0, checksumLength);
+      entropy.fill(0); digest.fill(0);
+      return expected === actual;
+    }
+  }
+
+  /* ========================================================================
+     CRYPTO ENGINE
+     SECURITY: A session is single-use. A fresh 256-bit system value is created
+     only on explicit start and wiped after generation or reset.
+     ======================================================================== */
+  class CryptoEngine {
+    constructor() {
+      this.systemEntropy = null;
+      this.consumed = false;
+    }
+
+    beginSession() {
+      if (!globalThis.crypto || typeof crypto.getRandomValues !== "function" || !crypto.subtle) throw new Error("WebCrypto unavailable");
+      this.destroy();
+      this.systemEntropy = new Uint8Array(32);
+      // SECURITY: Never replace this with Math.random().
+      crypto.getRandomValues(this.systemEntropy);
+      this.consumed = false;
+    }
+
+    async generate(wordCount, gameTranscript, physicalPayload) {
+      if (this.consumed || !this.systemEntropy) throw new Error("Entropy session is unavailable or already consumed");
+      if (wordCount !== 12 && wordCount !== 24) throw new Error("Invalid mnemonic length");
+      // SECURITY: Lock before awaiting to prevent double-click and async races.
+      this.consumed = true;
+      let systemComponent, gameComponent, physicalComponent, finalState, derived, entropy;
+      try {
+        systemComponent = await domainHash("EntropyRacer-v1-system", this.systemEntropy);
+        gameComponent = await domainHash("EntropyRacer-v1-game", gameTranscript);
+        physicalComponent = await domainHash("EntropyRacer-v1-physical", physicalPayload);
+        finalState = await domainHash("EntropyRacer-v1-final", systemComponent, gameComponent, physicalComponent);
+        derived = await domainHash(wordCount === 12 ? "EntropyRacer-v1-bip39-12" : "EntropyRacer-v1-bip39-24", finalState);
+        entropy = derived.slice(0, wordCount === 12 ? 16 : 32);
+        const words = await Bip39.entropyToWords(entropy);
+        // SECURITY: Failure of validation must prevent mnemonic display.
+        if (!(await Bip39.validate(words))) throw new Error("Generated mnemonic failed BIP39 validation");
+        return words;
+      } finally {
+        for (const value of [this.systemEntropy, systemComponent, gameComponent, physicalComponent, finalState, derived, entropy]) {
+          if (value instanceof Uint8Array) value.fill(0);
+        }
+        this.systemEntropy = null;
+      }
+    }
+
+    destroy() {
+      if (this.systemEntropy) this.systemEntropy.fill(0);
+      this.systemEntropy = null;
+      this.consumed = false;
+    }
+  }
+
+  /* ========================================================================
+     ENTROPY COLLECTORS
+     SECURITY: Gameplay event count and progress are collection metrics, not a
+     mathematical estimate of entropy. Fixed-width binary records are retained
+     only until this session is consumed or reset.
+     ======================================================================== */
+  class GameEntropyCollector {
+    constructor() { this.reset(); }
+
+    reset() {
+      this.destroy();
+      this.records = [];
+      this.count = 0;
+      this.sequence = 0;
+      this.startedAt = performance.now();
+      this.diversity = new Set();
+      this.distance = 0;
+      this.complete = false;
+    }
+
+    addDistance(value) { if (!this.complete && Number.isFinite(value)) this.distance += Math.max(0, value); }
+
+    record(type, state, aux1 = 0, aux2 = 0) {
+      if (this.complete) return;
+      // Cap high-frequency frame records, but continue accepting a small number
+      // of deliberate input/collision records so an idle player cannot make the
+      // diversity requirement permanently unreachable.
+      if ((this.count >= 1800 && type === 1) || this.count >= 1864) { this.checkReady(); return; }
+      const bytes = new Uint8Array(64);
+      const view = new DataView(bytes.buffer);
+      view.setUint8(0, 1);
+      view.setUint8(1, type & 255);
+      view.setUint16(2, state.keyMask & 65535, false);
+      view.setUint32(4, this.sequence++ >>> 0, false);
+      view.setFloat64(8, performance.now(), false);
+      view.setFloat64(16, state.dt || 0, false);
+      view.setFloat64(24, state.x || 0, false);
+      view.setFloat64(32, state.y || 0, false);
+      view.setFloat32(40, state.vx || 0, false);
+      view.setFloat32(44, state.vy || 0, false);
+      view.setFloat32(48, state.heading || 0, false);
+      view.setFloat32(52, aux1 || 0, false);
+      view.setFloat32(56, aux2 || 0, false);
+      view.setUint32(60, state.frame || 0, false);
+      this.records.push(bytes);
+      this.count++;
+      this.diversity.add(type);
+      this.checkReady();
+    }
+
+    checkReady() {
+      const elapsed = performance.now() - this.startedAt;
+      this.complete = this.count >= 1200 && elapsed >= 15000 && this.diversity.size >= 4 && this.distance >= 800;
+      return this.complete;
+    }
+
+    stats() {
+      const elapsed = performance.now() - this.startedAt;
+      const components = [Math.min(this.count / 1200, 1), Math.min(elapsed / 15000, 1), Math.min(this.diversity.size / 4, 1), Math.min(this.distance / 800, 1)];
+      let progress = components.reduce((sum, value) => sum + value, 0) / components.length;
+      if (!this.complete) progress = Math.min(progress, .99);
+      return { count: this.count, diversity: this.diversity.size, distance: this.distance, elapsed, progress, complete: this.complete };
+    }
+
+    exportTranscript() {
+      if (!this.complete) throw new Error("Gameplay collection is incomplete");
+      return concatBytes(u32(this.records.length), ...this.records);
+    }
+
+    destroy() {
+      if (this.records) for (const record of this.records) record.fill(0);
+      this.records = [];
+      this.count = 0;
+      this.sequence = 0;
+      this.diversity = new Set();
+      this.distance = 0;
+      this.complete = false;
+    }
+  }
+
+  class PhysicalEntropyCollector {
+    constructor() { this.bits = []; }
+    addCoin(bit) { if (this.bits.length < 256) this.bits.push(bit === 1 ? 1 : 0); }
+    addDie(face) {
+      if (face < 1 || face > 6) throw new Error("Invalid die face");
+      if (face > 4) return false;
+      if (this.bits.length <= 254) this.bits.push((face - 1) >> 1, (face - 1) & 1);
+      return true;
+    }
+    exportPayload(enabled) {
+      const bits = enabled ? this.bits : [];
+      const packed = new Uint8Array(Math.ceil(bits.length / 8));
+      for (let i = 0; i < bits.length; i++) packed[i >> 3] |= bits[i] << (7 - (i & 7));
+      return concatBytes(u32(bits.length), packed);
+    }
+    destroy() { this.bits.fill(0); this.bits.length = 0; }
+  }
+
+  /* ========================================================================
+     CRYPTOGRAPHIC SELF-TESTS
+     ======================================================================== */
+  async function runSelfTests() {
+    if (!globalThis.crypto || typeof crypto.getRandomValues !== "function" || !crypto.subtle) throw new Error("WebCrypto unavailable");
+    if (BIP39_WORDS.length !== 2048 || BIP39_WORDS[0] !== "abandon" || BIP39_WORDS[2047] !== "zoo") throw new Error("BIP39 word list invalid");
+    const wordListHash = await sha256(UTF8.encode(BIP39_WORDS.join("\n") + "\n"));
+    const actualWordListHash = Array.from(wordListHash, byte => byte.toString(16).padStart(2, "0")).join("");
+    wordListHash.fill(0);
+    if (actualWordListHash !== "2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda") throw new Error("BIP39 word list integrity test failed");
+    const emptyHash = await sha256(new Uint8Array());
+    const expectedEmpty = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+    const actualEmpty = Array.from(emptyHash, byte => byte.toString(16).padStart(2, "0")).join("");
+    emptyHash.fill(0);
+    if (actualEmpty !== expectedEmpty) throw new Error("SHA-256 test failed");
+    if (!constantTimeEqual(concatBytes(new Uint8Array([1,2]), new Uint8Array([3])), new Uint8Array([1,2,3]))) throw new Error("Byte concatenation test failed");
+    const frameA = framed("test", new Uint8Array([1]), new Uint8Array([2]));
+    const frameB = framed("test", new Uint8Array([1,2]), new Uint8Array());
+    if (constantTimeEqual(frameA, frameB)) throw new Error("Binary framing ambiguity test failed");
+
+    const zero128 = new Uint8Array(16);
+    const words128 = await Bip39.entropyToWords(zero128);
+    if (words128.join(" ") !== "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about" || !(await Bip39.validate(words128))) throw new Error("BIP39 128-bit vector failed");
+    const zero256 = new Uint8Array(32);
+    const words256 = await Bip39.entropyToWords(zero256);
+    if (words256.join(" ") !== "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art" || !(await Bip39.validate(words256))) throw new Error("BIP39 256-bit vector failed");
+    zero128.fill(0); zero256.fill(0); frameA.fill(0); frameB.fill(0); words128.fill(""); words256.fill("");
+    return true;
+  }
+
+  /* ========================================================================
+     LOCAL VISUAL AND AUDIO SYSTEMS
+     SECURITY: Visual randomness is deliberately separate and never enters the
+     system CSPRNG component. It is not relied upon as secret entropy.
+     ======================================================================== */
+  class VisualRng {
+    constructor(seed) { this.state = (seed >>> 0) || 0x93a7c21; }
+    next() { let x = this.state; x ^= x << 13; x ^= x >>> 17; x ^= x << 5; this.state = x >>> 0; return this.state / 4294967296; }
+    range(min, max) { return min + (max - min) * this.next(); }
+  }
+
+  class AudioFx {
+    constructor() { this.muted = false; this.context = null; }
+    setMuted(value) { this.muted = value; }
+    tone(frequency, duration = .05, type = "square", gainValue = .025) {
+      if (this.muted) return;
+      try {
+        if (!this.context) this.context = new (window.AudioContext || window.webkitAudioContext)();
+        const now = this.context.currentTime;
+        const oscillator = this.context.createOscillator();
+        const gain = this.context.createGain();
+        oscillator.type = type; oscillator.frequency.setValueAtTime(frequency, now);
+        oscillator.frequency.exponentialRampToValueAtTime(Math.max(40, frequency * .55), now + duration);
+        gain.gain.setValueAtTime(gainValue, now); gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
+        oscillator.connect(gain).connect(this.context.destination);
+        oscillator.start(now); oscillator.stop(now + duration);
+      } catch (_) { /* Audio is optional and never security-relevant. */ }
+    }
+    close() { if (this.context) { this.context.close().catch(() => {}); this.context = null; } }
+  }
+
+  /* ========================================================================
+     GAME ENGINE
+     ======================================================================== */
+  class GameEngine {
+    constructor(canvas, collector, audio) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d", { alpha: false });
+      this.collector = collector;
+      this.audio = audio;
+      this.rng = new VisualRng((Date.now() ^ Math.floor(performance.now() * 1000)) >>> 0);
+      this.keys = new Set();
+      this.player = { x: 0, y: 0, vx: 0, vy: 0, heading: -Math.PI / 2 };
+      this.enemies = [];
+      this.lasers = [];
+      this.particles = [];
+      this.frame = 0;
+      this.lastTime = performance.now();
+      this.lastShot = 0;
+      this.running = false;
+      this.raf = 0;
+      this.resizeObserver = new ResizeObserver(() => this.resize());
+      this.resizeObserver.observe(canvas.parentElement);
+      this.boundDown = event => this.onKey(event, true);
+      this.boundUp = event => this.onKey(event, false);
+      window.addEventListener("keydown", this.boundDown, { passive: false });
+      window.addEventListener("keyup", this.boundUp, { passive: false });
+      for (let i = 0; i < 11; i++) this.enemies.push(this.spawnEnemy(i));
+      this.resize();
+    }
+
+    resize() {
+      const rect = this.canvas.getBoundingClientRect();
+      const ratio = Math.min(devicePixelRatio || 1, 2);
+      this.width = Math.max(640, rect.width || 900);
+      this.height = Math.max(560, rect.height || 650);
+      this.canvas.width = Math.floor(this.width * ratio);
+      this.canvas.height = Math.floor(this.height * ratio);
+      this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    keyMask() {
+      return (this.keys.has("ArrowUp") ? 1 : 0) | (this.keys.has("ArrowDown") ? 2 : 0) | (this.keys.has("ArrowLeft") ? 4 : 0) | (this.keys.has("ArrowRight") ? 8 : 0) | (this.keys.has("Space") ? 16 : 0);
+    }
+
+    state(dt = 0) { return { keyMask: this.keyMask(), dt, x: this.player.x, y: this.player.y, vx: this.player.vx, vy: this.player.vy, heading: this.player.heading, frame: this.frame }; }
+
+    onKey(event, down) {
+      if (!this.running || !["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(event.code)) return;
+      event.preventDefault();
+      const changed = down ? !this.keys.has(event.code) : this.keys.has(event.code);
+      if (down) this.keys.add(event.code); else this.keys.delete(event.code);
+      if (changed) this.collector.record(down ? 2 : 3, this.state(), event.code === "Space" ? 5 : event.code.length, down ? 1 : 0);
+      if (down && event.code === "Space") this.fire();
+    }
+
+    spawnEnemy(index) {
+      const angle = this.rng.range(0, Math.PI * 2);
+      const radius = this.rng.range(500, 1300);
+      return { x: this.player.x + Math.cos(angle) * radius, y: this.player.y + Math.sin(angle) * radius, vx: this.rng.range(-40, 40), vy: this.rng.range(-40, 40), heading: this.rng.range(0, Math.PI * 2), hue: index % 2 ? "#a970ff" : "#3994ff", phase: this.rng.range(0, 100), hit: 0 };
+    }
+
+    recycleEnemy(enemy) { Object.assign(enemy, this.spawnEnemy(Math.floor(this.rng.range(0, 20)))); }
+
+    fire() {
+      const now = performance.now();
+      if (now - this.lastShot < 115) return;
+      this.lastShot = now;
+      const p = this.player;
+      this.lasers.push({ x: p.x + Math.cos(p.heading) * 24, y: p.y + Math.sin(p.heading) * 24, vx: p.vx + Math.cos(p.heading) * 720, vy: p.vy + Math.sin(p.heading) * 720, life: .85 });
+      if (this.lasers.length > 28) this.lasers.shift();
+      this.collector.record(4, this.state(), p.x, p.y);
+      this.audio.tone(430, .045, "sawtooth", .018);
+    }
+
+    burst(x, y, color, count = 12) {
+      for (let i = 0; i < count && this.particles.length < 180; i++) {
+        const a = this.rng.range(0, Math.PI * 2), speed = this.rng.range(30, 220);
+        this.particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: this.rng.range(.25, .8), max: .8, color, size: this.rng.range(1, 4) });
+      }
+    }
+
+    start() { if (this.running) return; this.running = true; this.lastTime = performance.now(); this.canvas.focus(); this.loop(this.lastTime); }
+    pause() { this.running = false; this.keys.clear(); cancelAnimationFrame(this.raf); }
+    destroy() { this.pause(); this.resizeObserver.disconnect(); window.removeEventListener("keydown", this.boundDown); window.removeEventListener("keyup", this.boundUp); this.lasers.length = 0; this.enemies.length = 0; this.particles.length = 0; }
+
+    loop(now) {
+      if (!this.running) return;
+      const dt = Math.min((now - this.lastTime) / 1000, .034);
+      this.lastTime = now;
+      this.update(dt, now);
+      this.draw(now);
+      this.raf = requestAnimationFrame(time => this.loop(time));
+    }
+
+    update(dt, now) {
+      this.frame++;
+      const p = this.player;
+      const beforeX = p.x, beforeY = p.y;
+      const speed = Math.hypot(p.vx, p.vy);
+      const turn = (this.keys.has("ArrowRight") ? 1 : 0) - (this.keys.has("ArrowLeft") ? 1 : 0);
+      p.heading += turn * (2.45 + Math.min(speed / 340, 1.2)) * dt;
+      const thrust = (this.keys.has("ArrowUp") ? 1 : 0) - (this.keys.has("ArrowDown") ? .62 : 0);
+      p.vx += Math.cos(p.heading) * thrust * 380 * dt;
+      p.vy += Math.sin(p.heading) * thrust * 380 * dt;
+      const drag = Math.pow(.985, dt * 60);
+      p.vx *= drag; p.vy *= drag;
+      const cap = 520;
+      if (speed > cap) { p.vx *= cap / speed; p.vy *= cap / speed; }
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      this.collector.addDistance(Math.hypot(p.x - beforeX, p.y - beforeY));
+      this.collector.record(1, this.state(dt), now - Math.floor(now), speed);
+      if (this.keys.has("Space")) this.fire();
+
+      for (const enemy of this.enemies) {
+        const target = Math.atan2(p.y - enemy.y, p.x - enemy.x) + Math.sin(now * .0007 + enemy.phase) * .7;
+        let delta = ((target - enemy.heading + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+        enemy.heading += Math.max(-1.2 * dt, Math.min(1.2 * dt, delta));
+        const enemySpeed = 105 + Math.sin(enemy.phase + now * .001) * 35;
+        enemy.vx += Math.cos(enemy.heading) * enemySpeed * dt;
+        enemy.vy += Math.sin(enemy.heading) * enemySpeed * dt;
+        enemy.vx *= Math.pow(.98, dt * 60); enemy.vy *= Math.pow(.98, dt * 60);
+        enemy.x += enemy.vx * dt; enemy.y += enemy.vy * dt; enemy.hit = Math.max(0, enemy.hit - dt);
+        const dist = Math.hypot(enemy.x - p.x, enemy.y - p.y);
+        if (dist > 1700) this.recycleEnemy(enemy);
+        if (dist < 35) {
+          const nx = (p.x - enemy.x) / Math.max(dist, 1), ny = (p.y - enemy.y) / Math.max(dist, 1);
+          p.vx += nx * 130; p.vy += ny * 130; enemy.vx -= nx * 90; enemy.vy -= ny * 90;
+          this.burst((p.x + enemy.x) / 2, (p.y + enemy.y) / 2, "#f7931a", 9);
+          this.collector.record(6, this.state(dt), enemy.x, enemy.y);
+          this.audio.tone(90, .08, "square", .018);
+        }
+      }
+
+      for (let i = this.lasers.length - 1; i >= 0; i--) {
+        const laser = this.lasers[i];
+        laser.x += laser.vx * dt; laser.y += laser.vy * dt; laser.life -= dt;
+        let remove = laser.life <= 0;
+        for (const enemy of this.enemies) {
+          if (!remove && Math.hypot(laser.x - enemy.x, laser.y - enemy.y) < 27) {
+            enemy.hit = .28; enemy.vx += laser.vx * .15; enemy.vy += laser.vy * .15;
+            this.burst(laser.x, laser.y, "#4ce9f5", 16);
+            this.collector.record(5, this.state(dt), laser.x, laser.y);
+            this.audio.tone(170, .09, "triangle", .025);
+            remove = true;
+          }
+        }
+        if (remove) this.lasers.splice(i, 1);
+      }
+
+      for (let i = this.particles.length - 1; i >= 0; i--) {
+        const particle = this.particles[i]; particle.x += particle.vx * dt; particle.y += particle.vy * dt; particle.vx *= .97; particle.vy *= .97; particle.life -= dt;
+        if (particle.life <= 0) this.particles.splice(i, 1);
+      }
+    }
+
+    worldToScreen(x, y) { return { x: x - this.player.x + this.width / 2, y: y - this.player.y + this.height / 2 }; }
+
+    cellNoise(x, y) { let n = (x * 374761393 + y * 668265263) | 0; n = (n ^ (n >>> 13)) * 1274126177; return ((n ^ (n >>> 16)) >>> 0) / 4294967296; }
+
+    draw(now) {
+      const c = this.ctx, w = this.width, h = this.height;
+      c.fillStyle = "#02050a"; c.fillRect(0, 0, w, h);
+      const grid = 120, startX = Math.floor((this.player.x - w / 2) / grid) - 1, endX = Math.ceil((this.player.x + w / 2) / grid) + 1, startY = Math.floor((this.player.y - h / 2) / grid) - 1, endY = Math.ceil((this.player.y + h / 2) / grid) + 1;
+      c.lineWidth = 1; c.strokeStyle = "rgba(66,168,215,.095)"; c.beginPath();
+      for (let gx = startX; gx <= endX; gx++) { const sx = gx * grid - this.player.x + w / 2; c.moveTo(sx, 0); c.lineTo(sx, h); }
+      for (let gy = startY; gy <= endY; gy++) { const sy = gy * grid - this.player.y + h / 2; c.moveTo(0, sy); c.lineTo(w, sy); }
+      c.stroke();
+      for (let gx = startX; gx <= endX; gx++) for (let gy = startY; gy <= endY; gy++) {
+        const n = this.cellNoise(gx, gy); if (n > .77) {
+          const sx = gx * grid + n * 90 - this.player.x + w / 2, sy = gy * grid + this.cellNoise(gy, gx) * 90 - this.player.y + h / 2;
+          c.fillStyle = n > .94 ? "rgba(247,147,26,.62)" : "rgba(106,200,255,.38)"; c.fillRect(sx, sy, n > .94 ? 2.4 : 1.2, n > .94 ? 2.4 : 1.2);
+        }
+      }
+
+      // Circuit lanes make the universe feel like a cryptographic machine.
+      c.setLineDash([18, 22]); c.lineWidth = 2; c.strokeStyle = "rgba(169,112,255,.11)";
+      const laneY = (Math.floor(this.player.y / 720) * 720) - this.player.y + h / 2;
+      c.beginPath(); c.moveTo(0, laneY); c.lineTo(w, laneY); c.stroke(); c.setLineDash([]);
+
+      for (const laser of this.lasers) { const s = this.worldToScreen(laser.x, laser.y); c.strokeStyle = "#4ce9f5"; c.lineWidth = 2; c.shadowColor = "#4ce9f5"; c.shadowBlur = 12; c.beginPath(); c.moveTo(s.x, s.y); c.lineTo(s.x - laser.vx * .022, s.y - laser.vy * .022); c.stroke(); }
+      c.shadowBlur = 0;
+
+      for (const enemy of this.enemies) { const s = this.worldToScreen(enemy.x, enemy.y); this.drawCar(s.x, s.y, enemy.heading, enemy.hit > 0 ? "#ffffff" : enemy.hue, false); }
+      for (const particle of this.particles) { const s = this.worldToScreen(particle.x, particle.y); c.globalAlpha = Math.max(0, particle.life / particle.max); c.fillStyle = particle.color; c.fillRect(s.x, s.y, particle.size, particle.size); }
+      c.globalAlpha = 1;
+
+      const speed = Math.hypot(this.player.vx, this.player.vy);
+      if (speed > 20) {
+        c.strokeStyle = "rgba(247,147,26,.24)"; c.lineWidth = 3; c.beginPath(); c.moveTo(w/2 - Math.cos(this.player.heading)*20, h/2 - Math.sin(this.player.heading)*20); c.lineTo(w/2 - Math.cos(this.player.heading)*(30 + speed*.08), h/2 - Math.sin(this.player.heading)*(30 + speed*.08)); c.stroke();
+      }
+      this.drawCar(w / 2, h / 2, this.player.heading, "#f7931a", true);
+
+      c.fillStyle = "rgba(2,5,10,.7)"; c.fillRect(14, 14, 150, 50);
+      c.fillStyle = "#6f879e"; c.font = "10px monospace"; c.fillText("VECTOR VELOCITY", 25, 32);
+      c.fillStyle = "#ffffff"; c.font = "bold 17px monospace"; c.fillText(String(Math.round(speed)).padStart(3, "0") + " u/s", 25, 54);
+      c.fillStyle = "rgba(76,233,245,.5)"; c.font = "10px monospace"; c.textAlign = "right"; c.fillText("BLOCK " + Math.abs(Math.floor(this.player.y / 720)).toString(16).toUpperCase().padStart(6,"0"), w - 18, 28); c.textAlign = "left";
+    }
+
+    drawCar(x, y, angle, color, player) {
+      const c = this.ctx; c.save(); c.translate(x, y); c.rotate(angle); c.shadowColor = color; c.shadowBlur = player ? 18 : 8;
+      c.fillStyle = color; c.beginPath(); c.moveTo(25, 0); c.lineTo(9, -13); c.lineTo(-19, -11); c.lineTo(-25, -5); c.lineTo(-25, 5); c.lineTo(-19, 11); c.lineTo(9, 13); c.closePath(); c.fill();
+      c.shadowBlur = 0; c.fillStyle = "#071019"; c.fillRect(-5, -9, 12, 18); c.fillStyle = player ? "#fff0d5" : "#c9e7ff"; c.fillRect(14, -6, 5, 12);
+      c.fillStyle = "#020407"; c.fillRect(-13,-15,8,5); c.fillRect(8,-15,8,5); c.fillRect(-13,10,8,5); c.fillRect(8,10,8,5); c.restore();
+    }
+  }
+
+  /* ========================================================================
+     UI CONTROLLER AND SENSITIVE STATE LIFECYCLE
+     SECURITY: Mnemonics are placed only in text nodes and never persisted,
+     copied, logged, placed in attributes, or encoded in a URL.
+     ======================================================================== */
+  class AppController {
+    constructor() {
+      this.cryptoEngine = new CryptoEngine();
+      this.gameCollector = new GameEntropyCollector();
+      this.physicalCollector = new PhysicalEntropyCollector();
+      this.audio = new AudioFx();
+      this.game = null;
+      this.wordCount = null;
+      this.selfTestsPassed = false;
+      this.mnemonicWords = null;
+      this.uiTimer = 0;
+      this.generating = false;
+      this.$ = id => document.getElementById(id);
+      this.bind();
+      this.environmentStatus();
+      this.runStartup();
+    }
+
+    bind() {
+      document.querySelectorAll(".choice").forEach(button => button.addEventListener("click", () => this.selectLength(Number(button.dataset.words))));
+      this.$("start-button").addEventListener("click", () => this.startSession());
+      this.$("reset-button").addEventListener("click", () => this.abortSession());
+      this.$("generate-button").addEventListener("click", () => this.openConfirmation());
+      this.$("return-game-button").addEventListener("click", () => this.returnToGame());
+      this.$("reveal-button").addEventListener("click", () => this.generateAndReveal());
+      this.$("destroy-button").addEventListener("click", () => this.destroyAndReset());
+      this.$("mute-button").addEventListener("click", () => this.toggleMute());
+      this.$("physical-toggle").addEventListener("change", event => {
+        this.$("physical-controls").hidden = !event.target.checked;
+        this.updateUi();
+      });
+      document.querySelectorAll("[data-coin]").forEach(button => button.addEventListener("click", () => {
+        this.physicalCollector.addCoin(Number(button.dataset.coin)); this.$("physical-note").textContent = button.dataset.coin === "0" ? "Heads recorded as 0." : "Tails recorded as 1."; this.updateUi();
+      }));
+      document.querySelectorAll("[data-die]").forEach(button => button.addEventListener("click", () => {
+        const face = Number(button.dataset.die); const accepted = this.physicalCollector.addDie(face);
+        this.$("physical-note").textContent = accepted ? `Die ${face} accepted as ${(face - 1).toString(2).padStart(2,"0")}.` : `Die ${face} rejected. Roll again; no bits were added.`; this.updateUi();
+      }));
+      document.addEventListener("visibilitychange", () => { if (document.hidden && this.game) this.game.keys.clear(); });
+    }
+
+    environmentStatus() {
+      const local = location.protocol === "file:";
+      const chip = this.$("context-chip");
+      chip.textContent = local ? "Local file mode" : "Online / web context";
+      chip.className = `chip ${local ? "good" : "warn"}`;
+      const mobile = matchMedia("(pointer: coarse)").matches || innerWidth < 760;
+      this.$("mobile-warning").hidden = !mobile;
+    }
+
+    async runStartup() {
+      try {
+        await runSelfTests();
+        this.selfTestsPassed = true;
+        this.$("crypto-chip").textContent = "Crypto self-tests passed";
+        this.$("crypto-chip").className = "chip good";
+        this.$("setup-status").textContent = "Self-tests passed. Choose a mnemonic length to begin.";
+        this.$("tech-csprng").textContent = "AVAILABLE";
+        this.$("tech-sha").textContent = "AVAILABLE + TESTED";
+        this.$("tech-words").textContent = "2,048 VERIFIED";
+        this.updateStartButton();
+      } catch (_) {
+        // SECURITY: Do not continue after a failed primitive or vector test.
+        this.selfTestsPassed = false;
+        this.$("crypto-chip").textContent = "Self-test failed";
+        this.$("crypto-chip").className = "chip bad";
+        this.$("fatal-error").hidden = false;
+        this.$("setup-status").textContent = "Generation is disabled because a required cryptographic self-test failed.";
+        this.$("tech-csprng").textContent = "UNAVAILABLE OR FAILED";
+        this.$("tech-sha").textContent = "FAILED";
+        this.$("tech-words").textContent = "FAILED";
+      }
+    }
+
+    selectLength(count) {
+      if (count !== 12 && count !== 24) return;
+      this.wordCount = count;
+      document.querySelectorAll(".choice").forEach(button => {
+        const selected = Number(button.dataset.words) === count;
+        button.classList.toggle("selected", selected); button.setAttribute("aria-checked", String(selected));
+      });
+      this.$("tech-mode").textContent = `${count} WORD`;
+      this.updateStartButton();
+    }
+
+    updateStartButton() { this.$("start-button").disabled = !(this.selfTestsPassed && this.wordCount); }
+
+    showOnly(id) {
+      ["setup-screen","game-screen","confirm-screen","reveal-screen"].forEach(screen => this.$(screen).hidden = screen !== id);
+      this.$("hero").hidden = id !== "setup-screen";
+      scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    startSession() {
+      if (!this.selfTestsPassed || !this.wordCount) return;
+      try {
+        this.cryptoEngine.beginSession();
+        this.gameCollector.reset(); this.physicalCollector.destroy();
+        this.$("physical-toggle").checked = false; this.$("physical-controls").hidden = true;
+        this.$("mode-label").textContent = `${this.wordCount}-word mode`;
+        this.$("tech-mode").textContent = `${this.wordCount} WORD`;
+        this.$("tech-system").textContent = "INITIALIZED";
+        this.$("tech-physical").textContent = "NOT USED";
+        this.showOnly("game-screen");
+        this.game = new GameEngine(this.$("game-canvas"), this.gameCollector, this.audio);
+        this.game.start();
+        clearInterval(this.uiTimer); this.uiTimer = setInterval(() => this.updateUi(), 120);
+        this.updateUi();
+      } catch (_) {
+        this.failClosed("Unable to initialize fresh system randomness. Wallet generation is disabled.");
+      }
+    }
+
+    updateUi() {
+      const stats = this.gameCollector.stats();
+      const percentage = Math.round(stats.progress * 100);
+      this.$("game-value").textContent = stats.complete ? `${stats.count.toLocaleString()} EVENTS · COMPLETE` : `${stats.count.toLocaleString()} EVENTS · COLLECTING`;
+      this.$("game-value").classList.toggle("ready", stats.complete);
+      this.$("game-meter").style.width = `${percentage}%`;
+      this.$("progress-label").textContent = `${percentage}%`;
+      this.$("tech-events").textContent = stats.count.toLocaleString();
+      const bits = this.physicalCollector.bits.length;
+      const physicalOn = this.$("physical-toggle").checked;
+      this.$("physical-value").textContent = `${physicalOn ? "ENABLED" : "OPTIONAL"} · ${bits} BITS`;
+      this.$("physical-meter").style.width = `${Math.min(bits / 256 * 100, 100)}%`;
+      this.$("tech-physical").textContent = physicalOn ? `${bits} BITS CONTRIBUTED` : "NOT USED";
+      this.$("reactor-core").classList.toggle("ready", stats.complete);
+      this.$("core-text").innerHTML = stats.complete ? "ENTROPY<br>READY" : "Gathering<br>gameplay chaos";
+      const generate = this.$("generate-button");
+      generate.disabled = !stats.complete;
+      generate.textContent = stats.complete ? `Generate ${this.wordCount}-word seed` : "Keep driving…";
+    }
+
+    openConfirmation() {
+      if (!this.gameCollector.checkReady() || this.generating) return;
+      this.game.pause(); this.showOnly("confirm-screen");
+    }
+
+    returnToGame() { if (!this.game || this.cryptoEngine.consumed) return; this.showOnly("game-screen"); this.game.start(); }
+
+    async generateAndReveal() {
+      if (this.generating || !this.gameCollector.complete || this.cryptoEngine.consumed) return;
+      this.generating = true;
+      this.$("reveal-button").disabled = true;
+      this.$("reveal-button").textContent = "Validating…";
+      let gameTranscript, physicalPayload;
+      try {
+        gameTranscript = this.gameCollector.exportTranscript();
+        physicalPayload = this.physicalCollector.exportPayload(this.$("physical-toggle").checked);
+        this.mnemonicWords = await this.cryptoEngine.generate(this.wordCount, gameTranscript, physicalPayload);
+        // Release all non-mnemonic session inputs immediately after consumption.
+        this.gameCollector.destroy(); this.physicalCollector.destroy();
+        if (this.game) { this.game.destroy(); this.game = null; }
+        clearInterval(this.uiTimer);
+        this.renderMnemonic();
+        this.$("tech-system").textContent = "CONSUMED + RELEASED";
+        this.$("tech-events").textContent = "CONSUMED + RELEASED";
+        this.showOnly("reveal-screen");
+      } catch (_) {
+        this.failClosed("Mnemonic generation or validation failed. No mnemonic was displayed; the session has been destroyed.");
+      } finally {
+        if (gameTranscript) gameTranscript.fill(0);
+        if (physicalPayload) physicalPayload.fill(0);
+        this.generating = false;
+        this.$("reveal-button").disabled = false;
+        this.$("reveal-button").textContent = "Generate + reveal once";
+      }
+    }
+
+    renderMnemonic() {
+      const grid = this.$("mnemonic-grid");
+      grid.replaceChildren();
+      for (let i = 0; i < this.mnemonicWords.length; i++) {
+        const item = document.createElement("div"); item.className = "word";
+        const index = document.createElement("span"); index.className = "word-index"; index.textContent = String(i + 1).padStart(2, "0");
+        const value = document.createElement("span"); value.className = "word-value"; value.textContent = this.mnemonicWords[i];
+        item.append(index, value); grid.append(item);
+      }
+    }
+
+    abortSession() {
+      if (!confirm("Abort this entropy session? All collected session data will be released and cannot be used.")) return;
+      this.destroyAndReset();
+    }
+
+    destroyAndReset() {
+      // SECURITY: Best-effort erasure only; browser/GC memory copies cannot be guaranteed.
+      this.$("mnemonic-grid").replaceChildren();
+      if (this.mnemonicWords) this.mnemonicWords.fill("");
+      this.mnemonicWords = null;
+      this.cryptoEngine.destroy(); this.gameCollector.destroy(); this.physicalCollector.destroy();
+      if (this.game) { this.game.destroy(); this.game = null; }
+      this.audio.close(); clearInterval(this.uiTimer);
+      this.wordCount = null; this.generating = false;
+      document.querySelectorAll(".choice").forEach(button => { button.classList.remove("selected"); button.setAttribute("aria-checked", "false"); });
+      this.$("start-button").disabled = true;
+      this.$("tech-mode").textContent = "NOT SELECTED";
+      this.$("tech-system").textContent = "NOT INITIALIZED";
+      this.$("tech-events").textContent = "0";
+      this.$("tech-physical").textContent = "NOT USED";
+      this.$("setup-status").textContent = "Previous session destroyed. Choose a mnemonic length to create an entirely fresh session.";
+      this.showOnly("setup-screen");
+    }
+
+    failClosed(message) {
+      this.cryptoEngine.destroy(); this.gameCollector.destroy(); this.physicalCollector.destroy();
+      if (this.game) { this.game.destroy(); this.game = null; }
+      if (this.mnemonicWords) this.mnemonicWords.fill(""); this.mnemonicWords = null;
+      clearInterval(this.uiTimer);
+      this.$("mnemonic-grid").replaceChildren();
+      this.$("fatal-error").textContent = `CRYPTOGRAPHIC OPERATION FAILED. WALLET GENERATION DISABLED. ${message}`;
+      this.$("fatal-error").hidden = false;
+      this.$("crypto-chip").textContent = "Generation disabled"; this.$("crypto-chip").className = "chip bad";
+      this.selfTestsPassed = false; this.showOnly("setup-screen"); this.updateStartButton();
+    }
+
+    toggleMute() {
+      this.audio.setMuted(!this.audio.muted);
+      this.$("mute-button").textContent = this.audio.muted ? "Sound off" : "Sound on";
+      this.$("mute-button").setAttribute("aria-pressed", String(this.audio.muted));
+    }
+  }
+
+  // SECURITY: No analytics, fetch, storage, service workers, console logging, or
+  // automatic clipboard interaction exists anywhere in this application.
+  new AppController();
+  </script>
+</body>
+</html>

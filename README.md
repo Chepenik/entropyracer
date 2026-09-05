@@ -9,14 +9,28 @@ generation through interactive gameplay.
 > a substitute for an established hardware-wallet workflow. Do not use it to
 > secure meaningful funds without reviewing and validating the implementation.
 
-The application is intended to be a single, self-contained HTML file that can
-be inspected, saved locally, disconnected from the internet, and opened in a
-modern desktop browser without network dependencies.
+The application is a single, self-contained HTML file that can be inspected,
+saved locally, disconnected from the internet, and opened in a modern desktop
+browser without network dependencies.
 
 ## Project status
 
-The application is under active development and is not yet ready for wallet
-generation.
+The first playable version is available for review. It includes internal
+cryptographic self-tests, but it has not received an independent security audit.
+
+## Run locally
+
+Download [entropy-racer.html](entropy-racer.html), disconnect networking, and
+open the file directly in a modern desktop browser. Use the arrow keys to drive
+and Space to fire.
+
+No server, installation, build tool, package manager, or network connection is
+required. The source, styles, official BIP39 English word list, and game are all
+contained in that one file.
+
+The repository's [SHA256SUMS](SHA256SUMS) file can detect accidental changes to
+the HTML. A checksum only establishes provenance when you obtain it through a
+channel you already trust.
 
 ## Security
 
